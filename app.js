@@ -10,10 +10,14 @@ var indexRouter = require('./routes/index');
 var userRouter = require('./routes/user');
 var registerRouter = require('./routes/register');
 var loginRouter = require('./routes/login');
+var moduleRouter = require('./routes/module');
+
 
 var monk = require('monk');
 var db = monk('localhost:27017/sign-in-backend');
 db.get('students').createIndex({ studentNumber: 1 }, { unique: true });
+db.get('lecturers').createIndex({ staffNumber: 1 }, { unique: true });
+db.get('modules').createIndex({ moduleId: 1 }, { unique: true });
 
 var app = express();
 
@@ -35,8 +39,10 @@ app.use(function(req,res,next){
 
 app.use('/', indexRouter);
 app.use('/user', userRouter);
-app.use('/registerStudent', registerRouter);
+app.use('/register', registerRouter);
 app.use('/login', loginRouter);
+app.use('/module', moduleRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
