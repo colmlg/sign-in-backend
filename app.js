@@ -6,18 +6,12 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var userRouter = require('./routes/user');
-var registerRouter = require('./routes/register');
-var loginRouter = require('./routes/login');
-var moduleRouter = require('./routes/module');
-
-
-var monk = require('monk');
-var db = monk('localhost:27017/sign-in-backend');
-db.get('students').createIndex({ studentNumber: 1 }, { unique: true });
-db.get('lecturers').createIndex({ staffNumber: 1 }, { unique: true });
-db.get('modules').createIndex({ moduleId: 1 }, { unique: true });
+var mongoose = require('mongoose');
+var mongoDB = 'mongodb://127.0.0.1/my_database';
+mongoose.connect(mongoDB);
+mongoose.Promise = global.Promise;
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 var app = express();
 
@@ -31,11 +25,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Make our db accessible to our router
-app.use(function(req,res,next){
-    req.db = db;
-    next();
-});
+var indexRouter = require('./routes/index');
+var userRouter = require('./routes/user');
+var registerRouter = require('./routes/register');
+var loginRouter = require('./routes/login');
+var moduleRouter = require('./routes/module');
 
 app.use('/', indexRouter);
 app.use('/user', userRouter);
