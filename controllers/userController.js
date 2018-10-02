@@ -11,13 +11,31 @@ exports.registerStudent = function(req, res) {
             return res.status(400).send("Student already registered.");
         }
 
-        var token = jwt.sign({ id: student.studentNumber }, process.env.TOKEN_SECRET, {
+        var token = jwt.sign({ id: user.studentNumber, role: "student" }, process.env.TOKEN_SECRET, {
             expiresIn: 86400 // expires in 24 hours
         });
 
         res.send({ success: true, token: token});
     });
 };
+
+exports.registerLecturer = function(req, res) {
+    var db = req.db;
+    var lecturer = req.body;
+    lecturer.password = bcrypt.hashSync(lecturer.password, 8);
+    db.collection('lecturers').insert(lecturer, function (error, user) {
+        if (error) {
+            return res.status(400).send("Lecturer already registered.");
+        }
+
+        var token = jwt.sign({ id: user.staffNumber, role: "lecturer"}, process.env.TOKEN_SECRET, {
+            expiresIn: 86400 // expires in 24 hours
+        });
+
+        res.send({ success: true, token: token});
+    });
+};
+
 
 exports.getStudent = function(req, res) {
     var db = req.db;
