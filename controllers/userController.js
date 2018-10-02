@@ -1,49 +1,30 @@
 var bcrypt = require('bcryptjs');
 var jwt = require('jsonwebtoken');
+var User = require('../models/user');
 
-
-exports.registerStudent = function(req, res) {
-    var db = req.db;
-    var student = req.body;
-    student.password = bcrypt.hashSync(student.password, 8);
-    db.collection('students').insert(student, function (error, user) {
-        if (error) {
-            return res.status(400).send("Student already registered.");
+exports.registerUser = function(req, res) {
+    var user = req.body;
+    user.password = bcrypt.hashSync(user.password, 8);
+    User.create(user, function (error, user) {
+        if(error) {
+            return res.status(500).json(error);
         }
 
-        var token = jwt.sign({ id: user.studentNumber, role: "student" }, process.env.TOKEN_SECRET, {
+        var token = jwt.sign({ id: user.id, role: user.role}, process.env.TOKEN_SECRET, {
             expiresIn: 86400 // expires in 24 hours
         });
 
-        res.send({ success: true, token: token});
+        res.status(200).json({token: token});
     });
 };
 
-exports.registerLecturer = function(req, res) {
-    var db = req.db;
-    var lecturer = req.body;
-    lecturer.password = bcrypt.hashSync(lecturer.password, 8);
-    db.collection('lecturers').insert(lecturer, function (error, user) {
+exports.getUser = function(req, res) {
+    User.find({ id: req.query.id }, function (error, user) {
         if (error) {
-            return res.status(400).send("Lecturer already registered.");
-        }
-
-        var token = jwt.sign({ id: user.staffNumber, role: "lecturer"}, process.env.TOKEN_SECRET, {
-            expiresIn: 86400 // expires in 24 hours
-        });
-
-        res.send({ success: true, token: token});
-    });
-};
-
-
-exports.getStudent = function(req, res) {
-    var db = req.db;
-    db.collection('students').findOne({ studentNumber: req.userId }, { _id: 0,  password: 0}, function(error, user) {
-        if (error || !user) {
-            return res.status(500).send("Unable to find user.");
+            return res.status(500).json(error);
         }
 
         res.status(200).json(user);
+
     });
 };

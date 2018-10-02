@@ -1,30 +1,24 @@
+var Module = require('../models/module');
 
 exports.addModule = function(req, res) {
-    var db = req.db;
-    var module = req.body;
-    module.lecturer = req.userId;
-
-    db.collection('modules').insert(req.body, {}, function(error, module) {
+    Module.create(req.body, function(error, module) {
         if (error) {
-            return res.status(500).send("Error adding module.js");
+            return res.status(500).json(error);
         }
-
-        res.status(200).send();
+        res.status(200).send(module);
     });
 };
 
 exports.getModule = function(req, res) {
-    var db = req.db;
 
-    db.collection('modules').findOne({ moduleId: req.query.moduleId }, {}, function(error, module) {
-        if(error || !module) {
-            return res.status(500).send("Error finding module");
+    Module.findOne({ id: req.query.id }, function (error, module) {
+        if (error || !module) {
+            return res.status(500).json(error);
         }
 
-        if (module.lecturer != req.userId) {
+        if (module.lecturers.indexOf(req.userId) == -1) {
             return res.status(401).send("Unauthorized");
         }
-
         res.status(200).json(module)
     });
 };

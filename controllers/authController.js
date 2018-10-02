@@ -1,40 +1,27 @@
 var bcrypt = require('bcryptjs');
 var jwt = require('jsonwebtoken');
+var User = require('../models/user');
 
-exports.studentLogin = function(req, res) {
-    var db = req.db;
-    db.collection('students').findOne({studentNumber: req.body.studentNumber},{},function(error, student) {
-        if (student == null || error) {
-            return res.status(400).send("Invalid student number.");
+exports.login = function(req, res) {
+    User.findOne({ id: req.body.id }, function(error, user) {
+        if(error) {
+            return res.status(500).json(error);
         }
 
-        if (bcrypt.compareSync(req.body.password, student.password)) {
-            var token = jwt.sign({ id: student.studentNumber, role: "student" }, process.env.TOKEN_SECRET, {
+        if(!user) {
+            return res.status(400).json({ error: "Invalid student number." });
+        }
+
+        if (bcrypt.compareSync(req.body.password, user.password)) {
+            var token = jwt.sign({ id: user.id, role: user.role }, process.env.TOKEN_SECRET, {
                 expiresIn: 86400 // expires in 24 hours
             });
+
             res.send({ token: token });
         } else {
-            res.status(400).send("Invalid password.");
-        }
-    });
-};
-
-
-exports.lecturerLogin = function(req, res) {
-    var db = req.db;
-    db.collection('lecturers').findOne({ staffNumber: req.body.staffNumber },{},function(error, lecturer) {
-        if (lecturer == null || error) {
-            return res.status(400).send("Invalid staff number.");
+            res.status(400).json({ error: "Invalid password." });
         }
 
-        if (bcrypt.compareSync(req.body.password, lecturer.password)) {
-            var token = jwt.sign({ id: lecturer.staffNumber, role: "lecturer" }, process.env.TOKEN_SECRET, {
-                expiresIn: 86400 // expires in 24 hours
-            });
-            res.send({ token: token });
-        } else {
-            res.status(400).send("Invalid password.");
-        }
     });
 };
 
