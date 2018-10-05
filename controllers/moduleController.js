@@ -1,19 +1,32 @@
 var Module = require('../models/module');
+var Event = require('../models/event');
 var moment = require('moment');
 require('moment-recur');
 
 exports.addModule = function(req, res) {
-    Module.create(req.body, function(error, module) {
+    var module = req.body;
+
+    Event.create(req.body.events, function(error, events) {
         if (error) {
             return res.status(500).json(error);
         }
-        res.status(200).send(module);
+
+        module.events = events.map(function(event){
+            return event._id;
+        });
+
+        Module.create(module, function(error, module) {
+            if (error) {
+                return res.status(500).json(error);
+            }
+            res.status(200).send(module);
+        });
     });
 };
 
 exports.getModule = function(req, res) {
 
-    Module.findOne({ id: req.query.id }, function (error, module) {
+    Module.findOne({ id: req.query.id }).populate('events').exec(function (error, module) {
         if (error || !module) {
             return res.status(500).json(error);
         }

@@ -7,7 +7,7 @@ var EventSchema = new Schema({
     duration: { type: Number, required: true },
     startDate: { type: String, required: true },
     endDate: { type: String, required: true },
-    roomNumber: { type: String, required: true }
+    roomNumber: { type: String, required: true },
 });
 
 var Event = mongoose.model(constants.EVENT_MODEL_NAME, EventSchema);
