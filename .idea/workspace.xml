@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8bfd438f-9914-4f67-9bc3-f6d67a42855f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/controllers/attendanceController.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/routes/attendance.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/authController.js" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/authController.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -81,20 +79,20 @@
       <usages-collector id="statistics.js.language.service.starts" />
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JavaScript" value="2430" />
-          <entry key="PLAIN_TEXT" value="236" />
+          <entry key="JavaScript" value="2434" />
+          <entry key="PLAIN_TEXT" value="282" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="env" value="118" />
-          <entry key="js" value="2430" />
-          <entry key="txt" value="118" />
+          <entry key="js" value="2434" />
+          <entry key="txt" value="164" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="JavaScript" value="11" />
+          <entry key="JavaScript" value="12" />
           <entry key="PLAIN_TEXT" value="2" />
         </counts>
       </usages-collector>
@@ -108,7 +106,7 @@
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="env" value="2" />
-          <entry key="js" value="11" />
+          <entry key="js" value="12" />
         </counts>
       </usages-collector>
     </session>
@@ -116,82 +114,19 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/routes/attendance.js">
+        <entry file="file://$PROJECT_DIR$/controllers/attendanceController.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="5" column="118" selection-start-line="5" selection-start-column="118" selection-end-line="5" selection-end-column="118" />
+            <state relative-caret-position="306">
+              <caret line="18" lean-forward="true" selection-start-line="18" selection-end-line="18" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/controllers/attendanceController.js">
+        <entry file="file://$PROJECT_DIR$/controllers/authController.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="106">
-              <caret line="41" column="50" selection-start-line="41" selection-start-column="50" selection-end-line="41" selection-end-column="50" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/node_modules/moment/moment.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5423">
-              <caret line="319" column="97" selection-start-line="319" selection-start-column="97" selection-end-line="319" selection-end-column="97" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="731">
-              <caret line="43" column="3" selection-start-line="43" selection-start-column="3" selection-end-line="43" selection-end-column="3" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.env">
-          <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="67" selection-start-column="67" selection-end-column="67" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/controllers/userController.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
-              <caret line="12" column="33" selection-start-line="12" selection-start-column="31" selection-end-line="12" selection-end-column="33" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/controllers/moduleController.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="969">
-              <caret line="57" column="46" selection-start-line="57" selection-start-column="12" selection-end-line="57" selection-end-column="46" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/routes/register.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="17">
-              <caret line="1" column="21" selection-start-line="1" selection-start-column="21" selection-end-line="1" selection-end-column="21" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/routes/login.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="4" column="14" selection-start-line="4" selection-start-column="14" selection-end-line="4" selection-end-column="14" />
+            <state relative-caret-position="218">
+              <caret line="47" column="29" selection-start-line="47" selection-start-column="29" selection-end-line="47" selection-end-column="29" />
             </state>
           </provider>
         </entry>
@@ -233,7 +168,6 @@
         <option value="$PROJECT_DIR$/models/user.js" />
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/routes/module.js" />
-        <option value="$PROJECT_DIR$/controllers/authController.js" />
         <option value="$PROJECT_DIR$/controllers/moduleController.js" />
         <option value="$PROJECT_DIR$/models/module.js" />
         <option value="$PROJECT_DIR$/models/event.js" />
@@ -241,6 +175,7 @@
         <option value="$PROJECT_DIR$/app.js" />
         <option value="$PROJECT_DIR$/.env" />
         <option value="$PROJECT_DIR$/controllers/attendanceController.js" />
+        <option value="$PROJECT_DIR$/controllers/authController.js" />
       </list>
     </option>
   </component>
@@ -291,11 +226,6 @@
               <item name="sign-in-backend" type="462c0819:PsiDirectoryNode" />
               <item name="models" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="sign-in-backend" type="b2602c69:ProjectViewProjectNode" />
-              <item name="sign-in-backend" type="462c0819:PsiDirectoryNode" />
-              <item name="routes" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -306,7 +236,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1538843984495" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1538844442116" />
     <property name="javascript.nodejs.core.library.configured.version" value="10.9.0" />
     <property name="nodejs_interpreter_path" value="node" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
@@ -351,7 +281,7 @@
       <workItem from="1538404060832" duration="732000" />
       <workItem from="1538741569728" duration="6191000" />
       <workItem from="1538752327907" duration="1910000" />
-      <workItem from="1538842236733" duration="1737000" />
+      <workItem from="1538842236733" duration="2201000" />
     </task>
     <task id="LOCAL-00001" summary="Seperated routes and controllers&#10;Added token verification middleware&#10;Added get user enpoint which uses token to identify user">
       <created>1538400274972</created>
@@ -381,17 +311,24 @@
       <option name="project" value="LOCAL" />
       <updated>1538746423606</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Compare date and time for module event">
+      <created>1538844108103</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1538844108103</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="38661000" />
+    <option name="totallyTimeSpent" value="39125000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1696" height="1026" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2720049" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2720049" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="npm" order="2" side_tool="true" />
       <window_info id="Image Layers" order="3" />
@@ -402,14 +339,14 @@
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49893504" weight="0.3299435" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49946752" weight="0.32881355" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.6723716" visible="true" weight="0.5605381" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.6723716" weight="0.5605381" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.49946752" weight="0.3299435" />
       <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.64242053" weight="0.34641257" />
-      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.32762837" side_tool="true" visible="true" weight="0.5605381" />
+      <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.6418093" visible="true" weight="0.34641257" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.35819072" side_tool="true" visible="true" weight="0.34641257" />
       <window_info active="true" anchor="bottom" id="Messages" order="11" sideWeight="0.49946752" visible="true" weight="0.32881355" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -434,7 +371,8 @@
     <MESSAGE value="Switched database connector to mongoose&#10;Created models for object types&#10;Replaced lecturer and student enpoints with unified User endpoints" />
     <MESSAGE value="Removed unused dependencies" />
     <MESSAGE value="Added Module and Event types&#10;Added moment-recur library&#10;Added endpoint to check if a module has an event on a certain date&#10;TODO: Check time as well&#10;&#10;Created constants file for shared constants&#10;Removed Unused files&#10;Added .gitignore file" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added Module and Event types&#10;Added moment-recur library&#10;Added endpoint to check if a module has an event on a certain date&#10;TODO: Check time as well&#10;&#10;Created constants file for shared constants&#10;Removed Unused files&#10;Added .gitignore file" />
+    <MESSAGE value="Compare date and time for module event" />
+    <option name="LAST_COMMIT_MESSAGE" value="Compare date and time for module event" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -450,30 +388,6 @@
           <line>23</line>
           <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="5" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/controllers/attendanceController.js</url>
-          <line>43</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="6" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/controllers/attendanceController.js</url>
-          <line>45</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="7" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/controllers/attendanceController.js</url>
-          <line>46</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/controllers/attendanceController.js</url>
-          <line>42</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -606,13 +520,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/controllers/authController.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="615">
-          <caret line="41" column="1" selection-start-line="41" selection-start-column="1" selection-end-line="41" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/models/user.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
@@ -713,8 +620,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/controllers/attendanceController.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="106">
-          <caret line="41" column="50" selection-start-line="41" selection-start-column="50" selection-end-line="41" selection-end-column="50" />
+        <state relative-caret-position="306">
+          <caret line="18" lean-forward="true" selection-start-line="18" selection-end-line="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/controllers/authController.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="218">
+          <caret line="47" column="29" selection-start-line="47" selection-start-column="29" selection-end-line="47" selection-end-column="29" />
         </state>
       </provider>
     </entry>
