@@ -3,7 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="8bfd438f-9914-4f67-9bc3-f6d67a42855f" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/authController.js" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/authController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/attendanceController.js" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/attendanceController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/event.js" beforeDir="false" afterPath="$PROJECT_DIR$/models/event.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -79,20 +80,20 @@
       <usages-collector id="statistics.js.language.service.starts" />
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JavaScript" value="2434" />
-          <entry key="PLAIN_TEXT" value="282" />
+          <entry key="JavaScript" value="2608" />
+          <entry key="PLAIN_TEXT" value="308" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="env" value="118" />
-          <entry key="js" value="2434" />
-          <entry key="txt" value="164" />
+          <entry key="js" value="2608" />
+          <entry key="txt" value="190" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="JavaScript" value="12" />
+          <entry key="JavaScript" value="13" />
           <entry key="PLAIN_TEXT" value="2" />
         </counts>
       </usages-collector>
@@ -106,27 +107,36 @@
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="env" value="2" />
-          <entry key="js" value="12" />
+          <entry key="js" value="13" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/controllers/attendanceController.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
-              <caret line="18" lean-forward="true" selection-start-line="18" selection-end-line="18" />
+            <state relative-caret-position="204">
+              <caret line="24" column="39" selection-start-line="24" selection-start-column="39" selection-end-line="24" selection-end-column="39" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/models/event.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="170">
+              <caret line="10" column="32" selection-start-line="10" selection-start-column="32" selection-end-line="10" selection-end-column="32" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/controllers/authController.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="218">
-              <caret line="47" column="29" selection-start-line="47" selection-start-column="29" selection-end-line="47" selection-end-column="29" />
+            <state relative-caret-position="399">
+              <caret line="58" column="7" lean-forward="true" selection-start-line="58" selection-start-column="7" selection-end-line="58" selection-end-column="7" />
             </state>
           </provider>
         </entry>
@@ -170,12 +180,12 @@
         <option value="$PROJECT_DIR$/routes/module.js" />
         <option value="$PROJECT_DIR$/controllers/moduleController.js" />
         <option value="$PROJECT_DIR$/models/module.js" />
-        <option value="$PROJECT_DIR$/models/event.js" />
         <option value="$PROJECT_DIR$/routes/attendance.js" />
         <option value="$PROJECT_DIR$/app.js" />
         <option value="$PROJECT_DIR$/.env" />
-        <option value="$PROJECT_DIR$/controllers/attendanceController.js" />
         <option value="$PROJECT_DIR$/controllers/authController.js" />
+        <option value="$PROJECT_DIR$/models/event.js" />
+        <option value="$PROJECT_DIR$/controllers/attendanceController.js" />
       </list>
     </option>
   </component>
@@ -236,7 +246,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1538844442116" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1538844900460" />
     <property name="javascript.nodejs.core.library.configured.version" value="10.9.0" />
     <property name="nodejs_interpreter_path" value="node" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
@@ -281,7 +291,7 @@
       <workItem from="1538404060832" duration="732000" />
       <workItem from="1538741569728" duration="6191000" />
       <workItem from="1538752327907" duration="1910000" />
-      <workItem from="1538842236733" duration="2201000" />
+      <workItem from="1538842236733" duration="2637000" />
     </task>
     <task id="LOCAL-00001" summary="Seperated routes and controllers&#10;Added token verification middleware&#10;Added get user enpoint which uses token to identify user">
       <created>1538400274972</created>
@@ -318,17 +328,24 @@
       <option name="project" value="LOCAL" />
       <updated>1538844108103</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Changed status codes">
+      <created>1538844498939</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1538844498939</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="39125000" />
+    <option name="totallyTimeSpent" value="39561000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1696" height="1026" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2720049" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2720049" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="npm" order="2" side_tool="true" />
       <window_info id="Image Layers" order="3" />
@@ -345,8 +362,8 @@
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.49946752" weight="0.3299435" />
       <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.6418093" visible="true" weight="0.34641257" />
-      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.35819072" side_tool="true" visible="true" weight="0.34641257" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="9" sideWeight="0.6418093" visible="true" weight="0.58295965" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.35819072" side_tool="true" visible="true" weight="0.58295965" />
       <window_info active="true" anchor="bottom" id="Messages" order="11" sideWeight="0.49946752" visible="true" weight="0.32881355" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -372,7 +389,8 @@
     <MESSAGE value="Removed unused dependencies" />
     <MESSAGE value="Added Module and Event types&#10;Added moment-recur library&#10;Added endpoint to check if a module has an event on a certain date&#10;TODO: Check time as well&#10;&#10;Created constants file for shared constants&#10;Removed Unused files&#10;Added .gitignore file" />
     <MESSAGE value="Compare date and time for module event" />
-    <option name="LAST_COMMIT_MESSAGE" value="Compare date and time for module event" />
+    <MESSAGE value="Changed status codes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changed status codes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -385,7 +403,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/controllers/attendanceController.js</url>
-          <line>23</line>
+          <line>30</line>
           <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="5" />
         </line-breakpoint>
@@ -541,13 +559,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/models/event.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" selection-start-line="10" selection-end-line="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/routes/module.js">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -618,17 +629,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/controllers/attendanceController.js">
+    <entry file="file://$PROJECT_DIR$/controllers/authController.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="18" lean-forward="true" selection-start-line="18" selection-end-line="18" />
+        <state relative-caret-position="399">
+          <caret line="58" column="7" lean-forward="true" selection-start-line="58" selection-start-column="7" selection-end-line="58" selection-end-column="7" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/controllers/authController.js">
+    <entry file="file://$PROJECT_DIR$/models/event.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="218">
-          <caret line="47" column="29" selection-start-line="47" selection-start-column="29" selection-end-line="47" selection-end-column="29" />
+        <state relative-caret-position="170">
+          <caret line="10" column="32" selection-start-line="10" selection-start-column="32" selection-end-line="10" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/controllers/attendanceController.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="24" column="39" selection-start-line="24" selection-start-column="39" selection-end-line="24" selection-end-column="39" />
         </state>
       </provider>
     </entry>

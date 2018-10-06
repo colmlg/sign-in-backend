@@ -21,7 +21,14 @@ exports.markAttendance = function(req, res) {
             var event = module.events[i]._doc;
 
             if (isEventCurrentlyOn(event) && event.roomNumber === req.body.roomNumber) {
-                return res.status(200).json({occurring: true, event: event});
+                event.studentsAttended.push(req.userId);
+                return module.events[i].save(function(error, updatedEvent){
+                   if(error) {
+                       return res.status(500).json(error);
+                   }
+                   res.status(200).json({occurring: true, event: updatedEvent});
+                });
+
             }
         }
 
@@ -41,7 +48,6 @@ var isEventCurrentlyOn = function(event) {
     //Moment-recur doesn't store any time information, so we have to check that separately
     var eventTime = moment(event.startTime, 'hh:mm').hours();
     var currentTime= moment().hours();
-    console.log(eventTime);
 
     var dateMatches = recurrence.matches(today);
     var timeMatches = currentTime >= eventTime && currentTime <= (eventTime + event.duration)
