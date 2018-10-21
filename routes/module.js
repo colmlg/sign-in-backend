@@ -7,6 +7,6 @@ router.get('/', authController.verifyToken, authController.verifyLecturer, modul
 
 router.post('/', authController.verifyToken, authController.verifyLecturer, moduleController.addModule);
 
-router.post('/isactive', authController.verifyToken, moduleController.isModuleActive);
+router.post('/students', authController.verifyToken, authController.verifyLecturer, moduleController.addStudentsToModule);
 
 module.exports = router;

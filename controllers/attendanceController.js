@@ -1,5 +1,4 @@
 var Module = require('../models/module');
-var Event = require('../models/event');
 var moment = require('moment');
 require('moment-recur');
 
@@ -21,7 +20,11 @@ exports.markAttendance = function(req, res) {
             var event = module.events[i]._doc;
 
             if (isEventCurrentlyOn(event) && event.roomNumber === req.body.roomNumber) {
-                event.studentsAttended.push(req.userId);
+
+                if (event.studentsAttended.indexOf(req.userId) === -1) {
+                    event.studentsAttended.push(req.userId);
+                }
+
                 return module.events[i].save(function(error, updatedEvent){
                    if(error) {
                        return res.status(500).json(error);
@@ -50,7 +53,7 @@ var isEventCurrentlyOn = function(event) {
     var currentTime= moment().hours();
 
     var dateMatches = recurrence.matches(today);
-    var timeMatches = currentTime >= eventTime && currentTime <= (eventTime + event.duration)
+    var timeMatches = currentTime >= eventTime && currentTime <= (eventTime + event.duration);
 
     return dateMatches && timeMatches;
 };
