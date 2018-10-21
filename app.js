@@ -7,7 +7,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var mongoose = require('mongoose');
-var mongoDB = 'mongodb://127.0.0.1/my_database';
+var mongoDB = 'mongodb://127.0.0.1/sign-in-backend';
 mongoose.connect(mongoDB);
 mongoose.Promise = global.Promise;
 var db = mongoose.connection;
@@ -29,11 +29,13 @@ var userRouter = require('./routes/user');
 var registerRouter = require('./routes/register');
 var loginRouter = require('./routes/login');
 var moduleRouter = require('./routes/module');
+var attendanceRouter = require('./routes/attendance');
 
 app.use('/user', userRouter);
 app.use('/register', registerRouter);
 app.use('/login', loginRouter);
 app.use('/module', moduleRouter);
+app.use('/attendance', attendanceRouter);
 
 
 // catch 404 and forward to error handler
