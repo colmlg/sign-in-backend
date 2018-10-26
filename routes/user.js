@@ -8,4 +8,6 @@ router.get('/', authController.verifyToken, authController.verifyStudent, userCo
 
 router.post('/image', authController.verifyToken, authController.verifyStudent, userController.setImage);
 
+router.get('/faceId', authController.verifyToken, authController.verifyStudent, userController.getFaceId);
+
 module.exports = router;
