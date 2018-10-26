@@ -28,3 +28,21 @@ exports.getUser = function(req, res) {
 
     });
 };
+
+exports.setImage = function(req, res) {
+    User.findOne({ id: req.userId }, function (error, user) {
+        if (error) {
+            return res.status(500).json(error);
+        }
+
+        user.referenceImage = req.body.image;
+        user.save(function(error) {
+            if (error) {
+                return res.status(500).json(error);
+            }
+
+
+            return res.status(200).json({});
+        });
+    });
+};

@@ -6,4 +6,6 @@ var userController = require('../controllers/userController');
 /* GET users listing. */
 router.get('/', authController.verifyToken, authController.verifyStudent, userController.getUser);
 
+router.post('/image', authController.verifyToken, authController.verifyStudent, userController.setImage);
+
 module.exports = router;
