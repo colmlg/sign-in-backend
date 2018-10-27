@@ -10,4 +10,6 @@ router.post('/image', authController.verifyToken, authController.verifyStudent, 
 
 router.get('/faceId', authController.verifyToken, authController.verifyStudent, userController.getFaceId);
 
+router.post('/verify', authController.verifyToken, authController.verifyStudent, userController.compareFaces);
+
 module.exports = router;
