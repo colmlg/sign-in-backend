@@ -1,5 +1,5 @@
-var Module = require('../models/module');
-var moment = require('moment');
+const Module = require('../models/module');
+const moment = require('moment');
 require('moment-recur');
 
 exports.markAttendance = function(req, res) {
@@ -16,8 +16,8 @@ exports.markAttendance = function(req, res) {
             return res.status(403).json({ error: 'You are not registered in this module.'});
         }
 
-        for(var i = 0; i < module.events.length; i++) {
-            var event = module.events[i]._doc;
+        for(let i = 0; i < module.events.length; i++) {
+            const event = module.events[i]._doc;
 
             if (isEventCurrentlyOn(event) && event.roomNumber === req.body.roomNumber) {
 
@@ -40,20 +40,20 @@ exports.markAttendance = function(req, res) {
     });
 };
 
-var isEventCurrentlyOn = function(event) {
-    var recurrence = moment().recur({
+function isEventCurrentlyOn(event) {
+    const recurrence = moment().recur({
         start: event.startDate,
         end: event.startDate
     }).every(1).weeks();
 
-    var today = moment().format("MM/DD/YYYY");
+    const today = moment().format("MM/DD/YYYY");
 
     //Moment-recur doesn't store any time information, so we have to check that separately
-    var eventTime = moment(event.startTime, 'hh:mm').hours();
-    var currentTime= moment().hours();
+    const eventTime = moment(event.startTime, 'hh:mm').hours();
+    const currentTime = moment().hours();
 
-    var dateMatches = recurrence.matches(today);
-    var timeMatches = currentTime >= eventTime && currentTime <= (eventTime + event.duration);
+    const dateMatches = recurrence.matches(today);
+    const timeMatches = currentTime >= eventTime && currentTime <= (eventTime + event.duration);
 
     return dateMatches && timeMatches;
-};
+}

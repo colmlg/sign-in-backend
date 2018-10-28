@@ -1,7 +1,7 @@
-var bcrypt = require('bcryptjs');
-var jwt = require('jsonwebtoken');
-var User = require('../models/user');
-var constants = require('../constants');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
+const constants = require('../constants');
 
 exports.login = function(req, res) {
     User.findOne({ id: req.body.id }, function(error, user) {
@@ -17,7 +17,7 @@ exports.login = function(req, res) {
             return res.status(401).json({error: 'Invalid password.'});
         }
 
-        var token = jwt.sign({ id: user.id, role: user.role }, process.env.TOKEN_SECRET, {
+        const token = jwt.sign({id: user.id, role: user.role}, process.env.TOKEN_SECRET, {
             expiresIn: 86400 // expires in 24 hours
         });
 
@@ -42,7 +42,7 @@ exports.verifyLecturer = function(req, res, next) {
 };
 
 exports.verifyToken = function(req, res, next) {
-    var token = req.headers['x-access-token'];
+    let token = req.headers['x-access-token'];
 
     if (!token) {
         return res.status(401).send({ error: 'No token provided.'});
