@@ -1,20 +1,20 @@
 require('dotenv').config();
 
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var bodyParser = require('body-parser');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const bodyParser = require('body-parser');
 
-var mongoose = require('mongoose');
-var mongoDB = 'mongodb://127.0.0.1/sign-in-backend';
+const mongoose = require('mongoose');
+const mongoDB = 'mongodb://127.0.0.1/sign-in-backend';
 mongoose.connect(mongoDB);
 mongoose.Promise = global.Promise;
-var db = mongoose.connection;
+const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-var app = express();
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -26,11 +26,11 @@ app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-var userRouter = require('./routes/user');
-var registerRouter = require('./routes/register');
-var loginRouter = require('./routes/login');
-var moduleRouter = require('./routes/module');
-var attendanceRouter = require('./routes/attendance');
+const userRouter = require('./routes/user');
+const registerRouter = require('./routes/register');
+const loginRouter = require('./routes/login');
+const moduleRouter = require('./routes/module');
+const attendanceRouter = require('./routes/attendance');
 
 app.use('/user', userRouter);
 app.use('/register', registerRouter);

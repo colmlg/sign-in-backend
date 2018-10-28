@@ -1,18 +1,29 @@
-var bcrypt = require('bcryptjs');
-var jwt = require('jsonwebtoken');
-var User = require('../models/user');
-var request = require('request');
-var constants =require('../constants');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
+const request = require('request');
+const constants = require('../constants');
+
+exports.getUser = function(req, res, next) {
+    User.findOne({ id: req.userId }, function (error, user) {
+        if (error) return res.status(500).json(error);
+
+        if (!user) return res.status(404).json({ error: "User not found." });
+
+        req.user = user;
+        next();
+    });
+};
 
 exports.registerUser = function(req, res) {
-    var user = req.body;
+    let user = req.body;
     user.password = bcrypt.hashSync(user.password, 8);
     User.create(user, function (error, user) {
         if(error) {
             return res.status(500).json(error);
         }
 
-        var token = jwt.sign({ id: user.id, role: user.role}, process.env.TOKEN_SECRET, {
+        const token = jwt.sign({id: user.id, role: user.role}, process.env.TOKEN_SECRET, {
             expiresIn: 86400 // expires in 24 hours
         });
 
@@ -20,135 +31,103 @@ exports.registerUser = function(req, res) {
     });
 };
 
-exports.getUser = function(req, res) {
-    User.findOne({ id: req.query.id }, function (error, user) {
-        if (error) {
-            return res.status(500).json(error);
-        }
-
-        res.status(200).json(user);
-
-    });
-};
-
 exports.setImage = function(req, res) {
-    User.findOne({ id: req.userId }, function (error, user) {
-        if (error) {
-            return res.status(500).json(error);
-        }
+    let user = req.user;
+    user.referenceImage = Buffer.from(req.body.image, 'base64');
+    user.save(function(error) {
+        if (error) return res.status(500).json(error);
 
-        user.referenceImage = Buffer.from(req.body.image, 'base64');
-        user.save(function(error) {
-            if (error) {
-                return res.status(500).json(error);
-            }
-
-
-            return res.status(200).json({});
-        });
+        return res.status(200).json({});
     });
 };
 
 exports.getFaceId = function(req, res) {
-    User.findOne({ id: req.userId }, function (error, user) {
-        if (error) {
-            return res.status(500).json(error);
-        }
+    const user = req.user;
+    if (user.referenceImage === undefined) {
+        return res.status(500).json({ error: "No face image for this user."});
+    }
 
-        if (user.referenceImage === undefined) {
-            return res.status(500).json({ error: "No face image for this user."});
-        }
-
-        getFaceId(user.referenceImage, function(error, faceId) {
-            if (error) {
-                return res.status(500).json(error);
-            }
-
-            return res.status(200).json({ faceId: faceId });
-        });
+    getFaceId(user.referenceImage).then(faceId => {
+        res.status(200).json({ faceId: faceId });
+    }).catch(error => {
+        res.status(500).json(error);
     });
 };
 
 exports.compareFaces = function(req, res) {
-    User.findOne({ id: req.userId }, function (error, user) {
-        if (error) {
-            return res.status(500).json(error);
-        }
+    const user = req.user;
+    if (user.referenceImage === undefined) {
+        return res.status(500).json({ error: "No face image for this user."});
+    }
 
-        if (user.referenceImage === undefined) {
-            return res.status(500).json({ error: "No face image for this user."});
-        }
+    const imageToCompare = Buffer.from(req.body.image, 'base64');
 
-        var imageToCompare = Buffer.from(req.body.image, 'base64');
-
-        getFaceId(user.referenceImage, function(error, faceId1) {
-            if (error) return res.status(500).json(error);
-
-            getFaceId(imageToCompare, function (error, faceId2) {
-                if (error) return res.status(500).json(error);
-
-                compareFaces(faceId1, faceId2, function(error, response) {
-                    if (error) return res.status(500).json(error);
-
-                    return res.status(200).json(JSON.parse(response));
-                });
-            });
-        });
+    Promise.all([ getFaceId(user.referenceImage), getFaceId(imageToCompare) ]).then(faceIds => {
+        return compareFaces(faceIds[0], faceIds[1]);
+    }).then(response => {
+        res.status(200).json(JSON.parse(response));
+    }).catch(error => {
+        res.status(500).json(error);
     });
 };
 
 
-var getFaceId = function(image, callback) {
-    var params = {
+ function getFaceId(image) {
+    const params = {
         'returnFaceId': 'true',
         'returnFaceLandmarks': 'false'
     };
 
-    var options = {
+    const options = {
         uri: constants.AZURE_BASE_URL + 'detect',
         qs: params,
         body: image,
         headers: {
             'Content-Type': 'application/octet-stream',
-            'Ocp-Apim-Subscription-Key' : process.env.AZURE_KEY
+            'Ocp-Apim-Subscription-Key': process.env.AZURE_KEY
         }
     };
 
-    request.post(options, function (error, response, body) {
-        if (error) {
-            return callback(error);
-        }
+    return new Promise(function(resolve, reject) {
+        request.post(options, function (error, response, body) {
+            if (error) return reject(error);
 
-        body = JSON.parse(body);
+            body = JSON.parse(body);
 
-        if (body[0] === undefined) {
-            return callback({ error: 'No Faces Detected' });
-        }
+            if (body[0] === undefined) {
+                return reject({ error: 'No Faces Detected' });
+            }
 
+            //The array of faces returned from Azure is sorted in descending order on rectangle size.
+            //We are only interested in the first face, as this is the largest and most likely
+            //to belong to the user.
+            resolve(body[0].faceId);
+        });
 
-        callback(null, body[0].faceId);
     });
-};
+}
 
-var compareFaces = function(faceId1, faceId2, callback) {
+function compareFaces(faceId1, faceId2) {
 
-    var body = {
+    const body = {
         faceId1: faceId1,
         faceId2: faceId2
     };
 
-    var options = {
+    const options = {
         uri: constants.AZURE_BASE_URL + 'verify',
         body: JSON.stringify(body),
         headers: {
             'Content-Type': 'application/json',
-            'Ocp-Apim-Subscription-Key' : process.env.AZURE_KEY
+            'Ocp-Apim-Subscription-Key': process.env.AZURE_KEY
         }
     };
 
-    request.post(options, function (error, response, body) {
-        if (error) return callback(error);
+    return new Promise(function(resolve, reject) {
+        request.post(options, function (error, response, body) {
+            if (error) return reject(error);
 
-        callback(null, body);
+            resolve(body);
+        });
     });
-};
+}
