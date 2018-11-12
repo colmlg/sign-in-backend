@@ -3,7 +3,7 @@ var router = express.Router();
 var authController = require('../controllers/authController');
 var moduleController = require('../controllers/moduleController');
 
-router.get('/', authController.verifyToken, authController.verifyLecturer, moduleController.getModule);
+router.get('/', authController.verifyToken, authController.verifyLecturer, moduleController.getModules);
 
 router.post('/', authController.verifyToken, authController.verifyLecturer, moduleController.addModule);
 

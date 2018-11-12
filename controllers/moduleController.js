@@ -23,6 +23,20 @@ exports.addModule = function(req, res) {
     });
 };
 
+exports.getModules = function(req, res) {
+    Module.find({ lecturer: req.userId }).populate('events').exec(function (error, modules) {
+        if (error || !module) {
+            return res.status(500).json(error);
+        }
+
+        if (module.lecturers.indexOf(req.userId) === -1) {
+            return res.status(403).send({ error: 'You are not a lecturer of this module.'});
+        }
+
+        res.status(200).json(modules)
+    });
+};
+
 exports.getModule = function(req, res) {
 
     Module.findOne({ id: req.query.id }).populate('events').exec(function (error, module) {
