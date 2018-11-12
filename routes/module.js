@@ -9,4 +9,7 @@ router.post('/', authController.verifyToken, authController.verifyLecturer, modu
 
 router.post('/students', authController.verifyToken, authController.verifyLecturer, moduleController.addStudentsToModule);
 
+router.post('/lecturers', authController.verifyToken, authController.verifyLecturer, moduleController.addLecturerToModule);
+
+
 module.exports = router;
