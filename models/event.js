@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 const constants = require('../constants');
 
 const EventSchema = new Schema({
+    type: {type: String, enum: [constants.LECTURE, constants.LAB, constants.TUTORIAL]},
     startTime: {type: String, required: true},
     duration: {type: Number, required: true},
     startDate: {type: String, required: true},
