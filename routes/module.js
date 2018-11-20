@@ -1,7 +1,7 @@
-var express = require('express');
-var router = express.Router();
-var authController = require('../controllers/authController');
-var moduleController = require('../controllers/moduleController');
+const express = require('express');
+const router = express.Router();
+const authController = require('../controllers/authController');
+const moduleController = require('../controllers/moduleController');
 
 router.get('/', authController.verifyToken, authController.verifyLecturer, moduleController.getModules);
 

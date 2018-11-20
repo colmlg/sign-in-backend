@@ -1,5 +1,5 @@
-var Module = require('../models/module');
-var Event = require('../models/event');
+const Module = require('../models/module');
+const Event = require('../models/event');
 require('moment-recur');
 
 exports.addModule = function(req, res) {
