@@ -58,18 +58,20 @@ exports.getFaceId = function (req, res) {
 exports.compareFaces = function (req, res) {
     const user = req.user;
     if (user.referenceImage === undefined) {
-        return res.status(500).json({error: "No face image for this user."});
+        return Promise.reject({ error: "No face image for this user."});
     }
 
     const imageToCompare = Buffer.from(req.body.image, 'base64');
 
-    Promise.all([getFaceId(user.referenceImage), getFaceId(imageToCompare)]).then(faceIds => {
+    return Promise.all([getFaceId(user.referenceImage), getFaceId(imageToCompare)]).then(faceIds => {
         return compareFaces(faceIds[0], faceIds[1]);
     }).then(response => {
-        res.status(200).json(JSON.parse(response));
-    }).catch(error => {
-        res.status(500).json(error);
-    });
+        if (response.body.isIdentical) {
+            return true
+        } else {
+            return Promise.reject({error: "Faces do not match."})
+        }
+    })
 };
 
 
@@ -153,7 +155,5 @@ function createClasses(userId) {
                 endWeek: aClass.weeks.split('-')[1]
             }
         });
-    }).then(events => {
-        Event.create(events).then()
-    })
+    }).then(Event.create)
 }
