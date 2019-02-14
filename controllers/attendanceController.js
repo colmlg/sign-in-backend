@@ -1,7 +1,6 @@
 const Module = require('../models/module');
 const Event = require('../models/event');
 const moment = require('moment');
-const UserController = require('../controllers/userController');
 const AzureService = require('../services/azureService');
 require('moment-recur');
 
@@ -35,8 +34,8 @@ exports.markAttendance = function(req, res) {
         }
 
         return event.save()
-    }).then(event => {
-        res.status(200).json({ success: true, event: event });
+    }).then(() => {
+        res.status(200).json();
     }).catch(error => {
         res.status(500).json(error);
     });

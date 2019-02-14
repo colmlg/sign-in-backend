@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const requestPromise = require('request-promise-native');
 
 exports.getUser = function (req, res, next) {
     User.findOne({id: req.userId}, function (error, user) {
