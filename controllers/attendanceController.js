@@ -2,6 +2,7 @@ const Module = require('../models/module');
 const Event = require('../models/event');
 const moment = require('moment');
 const UserController = require('../controllers/userController');
+const AzureService = require('../services/azureService');
 require('moment-recur');
 
 exports.markAttendance = function(req, res) {
@@ -15,14 +16,20 @@ exports.markAttendance = function(req, res) {
     }).then(event => {
         return Module.findOne({ id: event.moduleId }).then(module => {
             if (module.students.indexOf(req.userId) === -1) {
-                return Promise.reject({ error: "You are not registered for this module."})
+                return Promise.reject({ error: "You are not registered for this module."});
             }
 
             return event;
         })
     }).then(event => {
-        return UserController.compareFaces(req);
-    }).then(identical => {
+        return AzureService.compareFaces(req.user.referenceImage, req.body.image).then(identical => {
+            if(!identical) {
+                return Promise.reject({ error: "Faces do not match."});
+            }
+
+            return event;
+        });
+    }).then(event => {
         if (event.studentsAttended.indexOf(req.userId) === -1) {
             event.studentsAttended.push(req.userId);
         }
