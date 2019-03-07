@@ -3,45 +3,37 @@ const Event = require('../models/event');
 require('moment-recur');
 
 exports.addModule = function(req, res) {
-    Event.create(req.body.events, function(error, events) {
-        if (error) {
-            return res.status(500).json(error);
-        }
-
+    Event.create(req.body.events).then(events => {
         req.body.events = events.map(function(event){
             return event._id;
         });
 
-        Module.create(req.body, function(error, module) {
-            if (error) {
-                return res.status(500).json(error);
-            }
-            res.status(200).send(module);
-        });
+        return Module.create(req.body);
+    }).then(module => {
+        res.status(200).send(module);
+    }).catch(error => {
+        res.status(500).json({ error: error });
     });
 };
 
 exports.getModules = function(req, res) {
-    Module.find({ lecturers: req.userId }).populate('events').exec(function (error, modules) {
-        if (error || !modules) {
-            return res.status(500).json(error);
-        }
-
+    Module.find({ lecturers: req.userId }).populate('events').exec().then(modules => {
         res.status(200).json(modules)
+    }).catch(error => {
+        res.status(500).json({ error: error });
     });
 };
 
 exports.getModule = function(req, res) {
 
-    Module.findOne({ id: req.query.id }).populate('events').exec(function (error, module) {
-        if (error || !module) {
-            return res.status(500).json(error);
-        }
-
+    Module.findOne({ id: req.query.id }).populate('events').exec().then(module => {
         if (module.lecturers.indexOf(req.userId) === -1) {
             return res.status(403).send({ error: 'You are not a lecturer of this module.'});
         }
+
         res.status(200).json(module)
+    }).catch(error => {
+        res.status(500).json({ error: error });
     });
 };
 

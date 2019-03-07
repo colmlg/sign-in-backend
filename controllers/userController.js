@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const AzureService = require('../services/azureService');
 
 exports.getUser = function (req, res, next) {
     User.findOne({id: req.userId}, function (error, user) {
@@ -32,10 +33,14 @@ exports.registerUser = function (req, res) {
 exports.setImage = function (req, res) {
     let user = req.user;
     user.referenceImage = Buffer.from(req.body.image, 'base64');
-    user.save(function (error) {
-        if (error) return res.status(500).json(error);
 
-        return res.status(200).json({});
+    //Check with azure to see if we can get a face ID, because we don't want to save the image if we can't
+    AzureService.getFaceId(user.referenceImage).then(() => {
+        return user.save();
+    }).then(() => {
+        res.status(200).json({});
+    }).catch(error => {
+        res.status(500).json({ error: error });
     });
 };
 

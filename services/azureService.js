@@ -12,7 +12,7 @@ exports.compareFaces = function (referenceImage, imageToCompare) {
 };
 
 
-function getFaceId(image) {
+exports.getFaceId = function getFaceId(image) {
     const params = {
         'returnFaceId': 'true',
         'returnFaceLandmarks': 'false'
