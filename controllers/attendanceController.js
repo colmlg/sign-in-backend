@@ -1,42 +1,43 @@
 const Module = require('../models/module');
+const Event = require('../models/event');
 const moment = require('moment');
+const AzureService = require('../services/azureService');
 require('moment-recur');
 
 exports.markAttendance = function(req, res) {
-    Module.findOne({ id: req.body.moduleId }).populate('events').exec(function (error, module) {
-        if (error) {
-            return res.status(500).json(error);
-        }
-
-        if(!module) {
-            return res.status(404).send();
-        }
-
-        if(module.students.indexOf(req.userId) === -1) {
-            return res.status(403).json({ error: 'You are not registered in this module.'});
-        }
-
-        for(let i = 0; i < module.events.length; i++) {
-            const event = module.events[i]._doc;
-
-            if (isEventCurrentlyOn(event) && event.roomNumber === req.body.roomNumber) {
-
-                if (event.studentsAttended.indexOf(req.userId) === -1) {
-                    event.studentsAttended.push(req.userId);
-                }
-
-                return module.events[i].save(function(error, updatedEvent){
-                   if(error) {
-                       return res.status(500).json(error);
-                   }
-                   res.status(200).json({occurring: true, event: updatedEvent});
-                });
-
+    Event.find({ roomNumber: req.body.roomNumber }).then(events => {
+        for(let i = 0; i < events.length; i++) {
+            if (isEventCurrentlyOn(events[i])) {
+                return events[i];
             }
         }
+        return Promise.reject({ error: "No event on in this room right now."})
+    }).then(event => {
+        return Module.findOne({ id: event.moduleId }).then(module => {
+            if (module.students.indexOf(req.userId) === -1) {
+                return Promise.reject({ error: "You are not registered for this module."});
+            }
 
-        return res.status(200).json({ occurring: false });
+            return event;
+        })
+    }).then(event => {
+        return AzureService.compareFaces(req.user.referenceImage, req.body.image).then(identical => {
+            if(!identical) {
+                return Promise.reject({ error: "Faces do not match."});
+            }
 
+            return event;
+        });
+    }).then(event => {
+        if (event.studentsAttended.indexOf(req.userId) === -1) {
+            event.studentsAttended.push(req.userId);
+        }
+
+        return event.save()
+    }).then(() => {
+        res.status(200).json();
+    }).catch(error => {
+        res.status(500).json(error);
     });
 };
 

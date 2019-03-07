@@ -8,8 +8,5 @@ const userController = require('../controllers/userController');
 
 router.post('/image', authController.verifyToken, authController.verifyStudent, userController.getUser, userController.setImage);
 
-router.get('/faceId', authController.verifyToken, authController.verifyStudent, userController.getUser, userController.getFaceId);
-
-router.post('/verify', authController.verifyToken, authController.verifyStudent, userController.getUser, userController.compareFaces);
 
 module.exports = router;
