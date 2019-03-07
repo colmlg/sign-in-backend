@@ -12,7 +12,7 @@ exports.compareFaces = function (referenceImage, imageToCompare) {
 };
 
 
-exports.getFaceId = function getFaceId(image) {
+function getFaceId(image) {
     const params = {
         'returnFaceId': 'true',
         'returnFaceLandmarks': 'false'
@@ -47,6 +47,8 @@ exports.getFaceId = function getFaceId(image) {
     });
 }
 
+exports.getFaceId = getFaceId;
+
 function compareFaces(faceId1, faceId2) {
 
     const body = {
@@ -72,3 +74,4 @@ function compareFaces(faceId1, faceId2) {
         });
     });
 }
+
