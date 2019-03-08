@@ -44,26 +44,15 @@ exports.setImage = function (req, res) {
     });
 };
 
+const timetableScraper = require('../scrapers/timetableScraper');
+const Lesson = require('../models/lesson');
 
-// function createClasses(userId) {
-//
-//     const url = 'http://35.189.65.75/id-timetable-v2.php/id/' + userId + '/staff/true';
-//
-//     const options = {
-//         uri: url
-//     };
-//
-//     return requestPromise.get(options).then(timetable => {
-//         return timetable.classes.map(function(aClass){
-//             return {
-//                 type: aClass.type.split('-')[1],
-//                 roomNumber: aClass.room,
-//                 startTime: aClass.time.split('-')[0],
-//                 endTime: aClass.time.split('-')[1],
-//                 day: aClass.day,
-//                 startWeek: aClass.weeks.split('-')[0],
-//                 endWeek: aClass.weeks.split('-')[1]
-//             }
-//         });
-//     }).then(Event.create)
-// }
+exports.scrapeTimetable = function(req, res) {
+    timetableScraper.scrapeTimetable(req.query.id).then(lessons => {
+        return Lesson.create(lessons)
+    }).then(lessons => {
+        res.status(200).json(lessons);
+    }).catch(error => {
+        res.status(500).json(error);
+    });
+};

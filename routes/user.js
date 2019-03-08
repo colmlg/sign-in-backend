@@ -7,6 +7,6 @@ const userController = require('../controllers/userController');
 // router.get('/', authController.verifyToken, authController.verifyStudent, userController.getUser);
 
 router.post('/image', authController.verifyToken, authController.verifyStudent, userController.getUser, userController.setImage);
-
+router.get('/timetable', userController.scrapeTimetable);
 
 module.exports = router;

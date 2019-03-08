@@ -13,6 +13,6 @@ const LessonSchema = new Schema({
     _id:{type: String}
 });
 
-const Lesson = mongoose.model(constants.EVENT_MODEL_NAME, LessonSchema);
+const Lesson = mongoose.model(constants.LESSON_MODEL_NAME, LessonSchema);
 
 module.exports = Lesson;

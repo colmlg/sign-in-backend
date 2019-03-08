@@ -33,16 +33,18 @@ function parse(studentId, $) {
         });
     });
 
-
     lessons = lessons.flat(1);
     const mappedLessons = [];
     lessons.forEach(lesson => {
         lesson.weeks.forEach(week => {
-            const newLesson ={};
-            Object.assign(newLesson, lesson);
-            delete newLesson.weeks;
-            newLesson.week = week;
-            mappedLessons.push(newLesson);
+            mappedLessons.push(new Lesson({
+                startTime: lesson.startTime,
+                endTime: lesson.endTime,
+                moduleId: lesson.moduleId,
+                type: lesson.type,
+                roomNumber: lesson.roomNumber,
+                week: week,
+            }));
         });
     });
 
@@ -51,10 +53,10 @@ function parse(studentId, $) {
     //
 
     mappedLessons.map(lesson => {
-        lesson._id = lesson.module + '_' + lesson.startTime + "_" + lesson.week;
+        lesson._id = lesson.moduleId + '_' + lesson.type + "_" + lesson.startTime + "_" + lesson.week;
     });
 
-    return Lesson.create(mappedLessons);
+    return mappedLessons;
 }
 
 function scrapeTimetable(studentId) {
@@ -66,5 +68,6 @@ function scrapeTimetable(studentId) {
     };
     return rp.post(options).then(cheerio.load).then($ => parse(studentId, $));
 }
+
 
 exports.scrapeTimetable = scrapeTimetable;
