@@ -57,4 +57,9 @@ app.use(function(err, req, res) {
   res.render('error');
 });
 
+const weekScraper = require('./scrapers/weekScraper');
+weekScraper.saveToDB().then(() => {
+  console.log('Saved Weeks in Database');
+});
+
 module.exports = app;
