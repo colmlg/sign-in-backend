@@ -1,6 +1,7 @@
 const Module = require('../models/module');
 const Lesson = require('../models/lesson');
 const Week = require('../models/week');
+const Room = require('../models/room');
 const moment = require('moment');
 const AzureService = require('../services/azureService');
 
@@ -11,13 +12,15 @@ If they are, we use facial recognition to validate their identity.
 If that succeeds we add them to the list of students that attended this class.
  */
 exports.markAttendance = function (req, res) {
-    Lesson.find({roomNumber: req.body.roomNumber}).then(lessons => {
-        for (let i = 0; i < lessons.length; i++) {
-            if (isEventCurrentlyOn(lessons[i])) {
-                return lessons[i];
+    Room.findOne({ id: req.body.roomNumber}).then(roomNumber => {
+        return Lesson.find({roomNumber: roomNumber}).then(lessons => {
+            for (let i = 0; i < lessons.length; i++) {
+                if (isEventCurrentlyOn(lessons[i])) {
+                    return lessons[i];
+                }
             }
-        }
-        return Promise.reject({error: "No lesson on in this room right now."})
+            return Promise.reject({error: "No lesson on in this room right now."})
+        });
     }).then(lesson => {
         return Module.findOne({id: lesson.moduleId}).then(module => {
             if (module.students.indexOf(req.userId) === -1) {

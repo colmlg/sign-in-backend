@@ -21,11 +21,11 @@ exports.registerUser = function (req, res) {
     let user = req.body;
     user.password = bcrypt.hashSync(user.password, 8);
 
-    if (user.role === Constants.STUDENT) {
-        timetableScraper.saveLessons(user.id);
-    }
-
     User.create(user).then(user => {
+        if (user.role === Constants.STUDENT) {
+            timetableScraper.saveLessons(user.id);
+        }
+
         const token = jwt.sign({id: user.id, role: user.role}, process.env.TOKEN_SECRET, {
             expiresIn: 864000 // expires in 240 hours
         });

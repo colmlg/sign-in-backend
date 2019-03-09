@@ -1,4 +1,6 @@
 const Module = require('../models/module');
+const Lesson = require('../models/lesson');
+const Room = require('../models/room');
 const Event = require('../models/event');
 require('moment-recur');
 
@@ -26,12 +28,17 @@ exports.getModules = function (req, res) {
 
 exports.getModule = function (req, res) {
 
-    Module.findOne({id: req.query.id}).populate('events').exec().then(module => {
-        if (module.lecturers.indexOf(req.userId) === -1) {
+    Module.findOne({id: req.params.id}).exec().then(module => {
+        /*if (module.lecturers.indexOf(req.userId) === -1) {
             return res.status(403).send({error: 'You are not a lecturer of this module.'});
-        }
+        }*/
 
-        res.status(200).json(module)
+        return Lesson.find({moduleId: module.id}).then(lessons => {
+            res.status(200).json({
+                module: module,
+                lessons: lessons
+            });
+        });
     }).catch(error => {
         res.status(500).json({error: error});
     });
@@ -77,4 +84,10 @@ exports.addLecturerToModule = function (req, res) {
             res.status(200).json({module: updatedModule});
         });
     });
+};
+
+exports.getRoomNumbers = function(req, res) {
+    Room.find({}).select({ _id: 0, __v: 0}).then(rooms => {
+        res.status(200).json(rooms);
+    }).catch(error => res.status(500).json({error: error}));
 };

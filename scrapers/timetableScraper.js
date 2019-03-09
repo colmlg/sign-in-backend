@@ -4,6 +4,7 @@ const cheerio = require('cheerio');
 const Lesson = require('../models/lesson');
 const Week = require('../models/week');
 const Module = require('../models/module');
+const Room = require('../models/room');
 
 const studentIdPattern = /^[0-9]{7,8}$/;
 const entrySplitPattern = /\s*<.*?>(?:.*?<\/.*?>)?\s*(?:&#xA0;)?/;
@@ -22,6 +23,8 @@ function parseLesson(element) {
     };
 }
 
+//When we parse the information from the timetable we get a range of weeks.
+//This function creates a seperate object for each lesson.
 function createLessonForEachWeek(lesson, day) {
     const explodedLessons = [];
     for(let i =0; i < lesson.weeks.length; i++) {
@@ -59,8 +62,12 @@ function parse(studentId, $) {
     const moduleIds = new Set(lessons.map(lesson => {
         return lesson.moduleId;
     }));
-
     createModulesIfNotExists(moduleIds, studentId);
+
+    const roomNumbers = new Set(lessons.map(lesson => {
+        return lesson.roomNumber;
+    }));
+    saveRoom(roomNumbers);
 
     return Promise.all(lessons.map(lesson => {
         return setDate(lesson);
@@ -89,11 +96,24 @@ function createModulesIfNotExists(moduleIds, studentId) {
                 module.students.push(studentId);
             }
 
-            module.save()
+            module.save();
             console.log('Saving module ' + id);
         })
     })
 }
+
+function saveRoom(numbers) {
+    numbers.forEach(roomNumber => {
+        Room.find({roomNumber: roomNumber}).then(rooms => {
+            if(rooms.length === 0) {
+                const room = new Room({roomNumber: roomNumber});
+                room.save();
+                console.log('Created room ' + roomNumber);
+            }
+        })
+    });
+}
+
 function scrapeTimetable(studentId) {
     const options = {
         uri: 'https://www.timetable.ul.ie/tt2.asp',
@@ -108,7 +128,12 @@ function scrapeTimetable(studentId) {
 
 exports.saveLessons = function (studentId) {
     scrapeTimetable(studentId).then(lessons => {
-        return Lesson.create(lessons);
+        return Promise.all(lessons.map(lesson => {
+            return Lesson.find({_id: lesson._id }).then(lessons => {
+                if(lessons.length === 0)
+                    lesson.save();
+            });
+        }));
     }).then(() => {
         console.log('Scraped timetable for user ' + studentId);
     }).catch(error => {

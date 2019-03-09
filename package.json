@@ -19,6 +19,7 @@
     "moment": "^2.22.2",
     "moment-recur": "^1.0.7",
     "mongoose": "^5.3.1",
+    "mongoose-sequence": "^5.0.1",
     "morgan": "~1.9.0",
     "parse-numeric-range": "0.0.2",
     "pug": "2.0.0-beta11",
