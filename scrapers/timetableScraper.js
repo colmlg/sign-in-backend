@@ -2,6 +2,8 @@ const rangeParser = require('parse-numeric-range');
 const rp = require('request-promise-native');
 const cheerio = require('cheerio');
 const Lesson = require('../models/lesson');
+const Week = require('../models/week');
+const Module = require('../models/module');
 
 const studentIdPattern = /^[0-9]{7,8}$/;
 const entrySplitPattern = /\s*<.*?>(?:.*?<\/.*?>)?\s*(?:&#xA0;)?/;
@@ -24,41 +26,78 @@ function parseLesson(element) {
     };
 }
 
-function parse(studentId, $) {
-    let lessons = [];
-    $(daySelector).each((i, day) => {
-        lessons[i] = [];
-        $(entrySelector, day).each((j, lessonElement) => {
-            lessons[i][j] = parseLesson($(lessonElement).html());
+function createLessonForEachWeek(lesson, day) {
+    const explodedLessons = [];
+    for(let i =0; i < lesson.weeks.length; i++) {
+        explodedLessons.push({
+            startTime: lesson.startTime,
+            endTime: lesson.endTime,
+            moduleId: lesson.moduleId,
+            type: lesson.type,
+            roomNumber: lesson.roomNumber,
+            weekNumber: lesson.weeks[i],
+            day: day,
         });
-    });
-
-    lessons = lessons.flat(1);
-    const mappedLessons = [];
-    lessons.forEach(lesson => {
-        lesson.weeks.forEach(week => {
-            mappedLessons.push(new Lesson({
-                startTime: lesson.startTime,
-                endTime: lesson.endTime,
-                moduleId: lesson.moduleId,
-                type: lesson.type,
-                roomNumber: lesson.roomNumber,
-                week: week,
-            }));
-        });
-    });
-
-    //Create new object for each week
-    //For that object create new ID
-    //
-
-    mappedLessons.map(lesson => {
-        lesson._id = lesson.moduleId + '_' + lesson.type + "_" + lesson.startTime + "_" + lesson.week;
-    });
-
-    return mappedLessons;
+    }
+    return explodedLessons;
 }
 
+function setDate(lesson) {
+    return Week.find({id: lesson.weekNumber}).then(weeks => {
+        const myDate = weeks[0].date;
+        myDate.setDate(myDate.getDate() + lesson.day);
+        lesson.date = myDate;
+    });
+}
+
+function parse(studentId, $) {
+    let lessons = [];
+    $(daySelector).each((dayIndex, day) => {
+        $(entrySelector, day).each((j, lessonElement) => {
+            const parsedLesson = parseLesson($(lessonElement).html());
+            const allLessons = createLessonForEachWeek(parsedLesson, dayIndex)
+            Array.prototype.push.apply(lessons, allLessons);
+        });
+    });
+
+    const moduleIds = new Set(lessons.map(lesson => {
+        return lesson.moduleId;
+    }));
+
+    createModulesIfNotExists(moduleIds, studentId);
+
+    return Promise.all(lessons.map(lesson => {
+        return setDate(lesson);
+    })).then(() => {
+        return lessons.map(lesson => {
+            lesson._id = lesson.moduleId + '_' + lesson.type + "_" + lesson.startTime + "_" + lesson.date;
+            return new Lesson(lesson);
+        });
+    });
+}
+
+function createModulesIfNotExists(moduleIds, studentId) {
+    moduleIds.forEach(id => {
+        Module.find({id: id}).then(modules => {
+            let module;
+            if(modules.length === 0) {
+                module = new Module({
+                    id: id,
+                    students: []
+                });
+            } else {
+                module = modules[0];
+            }
+
+            if (module.students.indexOf(studentId) === -1) {
+                module.students.push(studentId);
+            }
+
+            module.save()
+            console.log('Saving module ' + id);
+        })
+    })
+}
 function scrapeTimetable(studentId) {
     const options = {
         uri: 'https://www.timetable.ul.ie/tt2.asp',
@@ -66,8 +105,20 @@ function scrapeTimetable(studentId) {
             T1: studentId,
         },
     };
-    return rp.post(options).then(cheerio.load).then($ => parse(studentId, $));
+    return rp.post(options).then(cheerio.load).then($ => {
+        return parse(studentId, $)
+    });
 }
 
+exports.saveLessons = function (studentId) {
+    scrapeTimetable(studentId).then(lessons => {
+        return Lesson.create(lessons);
+    }).then(() => {
+        console.log('Scraped timetable for user ' + studentId);
+    }).catch(error => {
+        console.log('Error getting timetable for user ' + studentId);
+        console.log(error);
+    });
+};
 
 exports.scrapeTimetable = scrapeTimetable;

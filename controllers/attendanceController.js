@@ -1,29 +1,35 @@
 const Module = require('../models/module');
-const Event = require('../models/event');
+const Lesson = require('../models/lesson');
+const Week = require('../models/week');
 const moment = require('moment');
 const AzureService = require('../services/azureService');
-require('moment-recur');
 
-exports.markAttendance = function(req, res) {
-    Event.find({ roomNumber: req.body.roomNumber }).then(events => {
-        for(let i = 0; i < events.length; i++) {
-            if (isEventCurrentlyOn(events[i])) {
-                return events[i];
+/* Marks a user as having attended a lesson.
+First, we find the lesson currently on in this room.
+Then, we check is this student registered for this module.
+If they are, we use facial recognition to validate their identity.
+If that succeeds we add them to the list of students that attended this class.
+ */
+exports.markAttendance = function (req, res) {
+    Lesson.find({roomNumber: req.body.roomNumber}).then(lessons => {
+        for (let i = 0; i < lessons.length; i++) {
+            if (isEventCurrentlyOn(lessons[i])) {
+                return lessons[i];
             }
         }
-        return Promise.reject({ error: "No event on in this room right now."})
-    }).then(event => {
-        return Module.findOne({ id: event.moduleId }).then(module => {
+        return Promise.reject({error: "No lesson on in this room right now."})
+    }).then(lesson => {
+        return Module.findOne({id: lesson.moduleId}).then(module => {
             if (module.students.indexOf(req.userId) === -1) {
-                return Promise.reject({ error: "You are not registered for this module."});
+                return Promise.reject({error: "You are not registered for this module."});
             }
 
-            return event;
+            return lesson;
         })
     }).then(event => {
         return AzureService.compareFaces(req.user.referenceImage, req.body.image).then(identical => {
-            if(!identical) {
-                return Promise.reject({ error: "Faces do not match."});
+            if (!identical) {
+                return Promise.reject({error: "Faces do not match."});
             }
 
             return event;
@@ -42,19 +48,16 @@ exports.markAttendance = function(req, res) {
 };
 
 function isEventCurrentlyOn(event) {
-    const recurrence = moment().recur({
-        start: event.startDate,
-        end: event.startDate
-    }).every(1).weeks();
+    const today = moment().format("DD/MM/YYYY");
 
-    const today = moment().format("MM/DD/YYYY");
-
-    //Moment-recur doesn't store any time information, so we have to check that separately
-    const eventTime = moment(event.startTime, 'hh:mm').hours();
+    const startTime = moment(event.startTime, 'hh:mm').hours();
     const currentTime = moment().hours();
 
-    const dateMatches = recurrence.matches(today);
-    const timeMatches = currentTime >= eventTime && currentTime <= (eventTime + event.duration);
+    const endTime = moment(event.endTime, 'hh:mm').hours();
+    const duration = endTime - startTime;
+
+    const dateMatches = event.date.isSame(today, 'day');
+    const timeMatches = currentTime >= startTime && currentTime <= (startTime + duration);
 
     return dateMatches && timeMatches;
 }

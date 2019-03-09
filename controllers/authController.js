@@ -3,14 +3,14 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const constants = require('../constants');
 
-exports.login = function(req, res) {
-    User.findOne({ id: req.body.id }, function(error, user) {
-        if(error) {
+exports.login = function (req, res) {
+    User.findOne({id: req.body.id}, function (error, user) {
+        if (error) {
             return res.status(500).json(error);
         }
 
-        if(!user) {
-            return res.status(401).json({ error: 'Invalid student number.' });
+        if (!user) {
+            return res.status(401).json({error: 'Invalid student number.'});
         }
 
         if (!bcrypt.compareSync(req.body.password, user.password)) {
@@ -21,36 +21,36 @@ exports.login = function(req, res) {
             expiresIn: 86400 // expires in 24 hours
         });
 
-        res.send({ token: token });
+        res.send({token: token});
     });
 };
 
-exports.verifyStudent = function(req, res, next) {
+exports.verifyStudent = function (req, res, next) {
     if (req.role === constants.STUDENT) {
         next();
     } else {
-        res.status(403).send({ error: 'You must be a student to access this resource.' });
+        res.status(403).send({error: 'You must be a student to access this resource.'});
     }
 };
 
-exports.verifyLecturer = function(req, res, next) {
+exports.verifyLecturer = function (req, res, next) {
     if (req.role === constants.LECTURER) {
         next();
     } else {
-        res.status(403).send({ error: 'You must be a lecturer to access this resource.' });
+        res.status(403).send({error: 'You must be a lecturer to access this resource.'});
     }
 };
 
-exports.verifyToken = function(req, res, next) {
+exports.verifyToken = function (req, res, next) {
     let token = req.headers['x-access-token'];
 
     if (!token) {
-        return res.status(401).send({ error: 'No token provided.'});
+        return res.status(401).send({error: 'No token provided.'});
     }
 
-    jwt.verify(token, process.env.TOKEN_SECRET, function(err, decoded) {
+    jwt.verify(token, process.env.TOKEN_SECRET, function (err, decoded) {
         if (err) {
-            return res.status(401).send({ error: 'Invalid token.'});
+            return res.status(401).send({error: 'Invalid token.'});
         }
 
         req.userId = decoded.id;

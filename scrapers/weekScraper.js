@@ -25,9 +25,15 @@ function scrapeWeeks() {
 
 function saveToDB() {
     return scrapeWeeks().then(weeks => {
-        return Promise.all(weeks.map(week => {
-            week.save();
-        }))
+        weeks.forEach(updatedWeek => {
+            Week.find({id: updatedWeek.id}).then(dbWeek => {
+                dbWeek = dbWeek[0];
+                dbWeek.date = updatedWeek.date;
+                dbWeek.save();
+            }).catch(error => {
+                updatedWeek.save()
+            })
+        })
     }).catch(error => {
         console.log(error);
     })

@@ -1,7 +1,10 @@
+const Constants = require("../constants");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const Lesson = require('../models/lesson');
 const AzureService = require('../services/azureService');
+const timetableScraper = require('../scrapers/timetableScraper');
 
 exports.getUser = function (req, res, next) {
     User.findOne({id: req.userId}, function (error, user) {
@@ -17,16 +20,19 @@ exports.getUser = function (req, res, next) {
 exports.registerUser = function (req, res) {
     let user = req.body;
     user.password = bcrypt.hashSync(user.password, 8);
-    User.create(user, function (error, user) {
-        if (error) {
-            return res.status(500).json(error);
-        }
 
+    if (user.role === Constants.STUDENT) {
+        timetableScraper.saveLessons(user.id);
+    }
+
+    User.create(user).then(user => {
         const token = jwt.sign({id: user.id, role: user.role}, process.env.TOKEN_SECRET, {
-            expiresIn: 86400 // expires in 24 hours
+            expiresIn: 864000 // expires in 240 hours
         });
 
         res.status(200).json({token: token});
+    }).catch(error => {
+        res.status(500).json({ error: error });
     });
 };
 
@@ -40,17 +46,12 @@ exports.setImage = function (req, res) {
     }).then(() => {
         res.status(200).json({});
     }).catch(error => {
-        res.status(500).json({ error: error });
+        res.status(500).json({error: error});
     });
 };
 
-const timetableScraper = require('../scrapers/timetableScraper');
-const Lesson = require('../models/lesson');
-
-exports.scrapeTimetable = function(req, res) {
-    timetableScraper.scrapeTimetable(req.query.id).then(lessons => {
-        return Lesson.create(lessons)
-    }).then(lessons => {
+exports.scrapeTimetable = function (req, res) {
+    timetableScraper.scrapeTimetable(req.query.id).then(Lesson.create).then(lessons => {
         res.status(200).json(lessons);
     }).catch(error => {
         res.status(500).json(error);
