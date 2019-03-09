@@ -10,10 +10,6 @@ const entrySplitPattern = /\s*<.*?>(?:.*?<\/.*?>)?\s*(?:&#xA0;)?/;
 const daySelector = 'body > div > table > tbody > tr:nth-child(2) > td';
 const entrySelector = 'p > font > b';
 
-function validateStudentId(studentId) {
-    return studentIdPattern.test(studentId);
-}
-
 function parseLesson(element) {
     const parts = element.trim().split(entrySplitPattern);
     return {
