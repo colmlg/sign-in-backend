@@ -126,8 +126,8 @@ function scrapeTimetable(studentId) {
     });
 }
 
-exports.saveLessons = function (studentId) {
-    scrapeTimetable(studentId).then(lessons => {
+exports.saveLessons = function (userId) {
+    scrapeTimetable(userId).then(lessons => {
         return Promise.all(lessons.map(lesson => {
             return Lesson.find({_id: lesson._id }).then(lessons => {
                 if(lessons.length === 0)
@@ -135,9 +135,9 @@ exports.saveLessons = function (studentId) {
             });
         }));
     }).then(() => {
-        console.log('Scraped timetable for user ' + studentId);
+        console.log('Scraped timetable for lecturer ' + userId);
     }).catch(error => {
-        console.log('Error getting timetable for user ' + studentId);
+        console.log('Error getting timetable for lecturer ' + userId);
         console.log(error);
     });
 };
