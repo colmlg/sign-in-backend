@@ -11,5 +11,8 @@ router.post('/students', authController.verifyToken, authController.verifyLectur
 
 router.post('/lecturers', authController.verifyToken, authController.verifyLecturer, moduleController.addLecturerToModule);
 
+router.get('/room', moduleController.getRoomNumbers);
+
+router.get('/:id', authController.verifyToken, authController.verifyLecturer, moduleController.getModule);
 
 module.exports = router;
