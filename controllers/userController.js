@@ -5,6 +5,7 @@ const User = require('../models/user');
 const Lesson = require('../models/lesson');
 const AzureService = require('../services/azureService');
 const timetableScraper = require('../scrapers/timetableScraper');
+const lecturerTimetableScraper = require('../scrapers/lecturerTimetableScraper');
 
 exports.getUser = function (req, res, next) {
     User.findOne({id: req.userId}, function (error, user) {
@@ -24,6 +25,8 @@ exports.registerUser = function (req, res) {
     User.create(user).then(user => {
         if (user.role === Constants.STUDENT) {
             timetableScraper.saveLessons(user.id);
+        } else {
+            lecturerTimetableScraper.saveLessons(user.id);
         }
 
         const token = jwt.sign({id: user.id, role: user.role}, process.env.TOKEN_SECRET, {
