@@ -12,8 +12,8 @@ If they are, we use facial recognition to validate their identity.
 If that succeeds we add them to the list of students that attended this class.
  */
 exports.markAttendance = function (req, res) {
-    Room.findOne({ id: req.body.roomNumber}).then(roomNumber => {
-        return Lesson.find({roomNumber: roomNumber}).then(lessons => {
+    Room.findOne({ id: req.body.roomNumber}).then(room => {
+        return Lesson.find({roomNumber: room.roomNumber}).then(lessons => {
             for (let i = 0; i < lessons.length; i++) {
                 if (isLessonCurrentlyOn(lessons[i])) {
                     return lessons[i];
