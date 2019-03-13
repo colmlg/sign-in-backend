@@ -15,7 +15,7 @@ exports.markAttendance = function (req, res) {
     Room.findOne({ id: req.body.roomNumber}).then(roomNumber => {
         return Lesson.find({roomNumber: roomNumber}).then(lessons => {
             for (let i = 0; i < lessons.length; i++) {
-                if (isEventCurrentlyOn(lessons[i])) {
+                if (isLessonCurrentlyOn(lessons[i])) {
                     return lessons[i];
                 }
             }
@@ -50,8 +50,8 @@ exports.markAttendance = function (req, res) {
     });
 };
 
-function isEventCurrentlyOn(event) {
-    const today = moment().format("DD/MM/YYYY");
+function isLessonCurrentlyOn(event) {
+    const today = moment();
 
     const startTime = moment(event.startTime, 'hh:mm').hours();
     const currentTime = moment().hours();
@@ -59,7 +59,7 @@ function isEventCurrentlyOn(event) {
     const endTime = moment(event.endTime, 'hh:mm').hours();
     const duration = endTime - startTime;
 
-    const dateMatches = event.date.isSame(today, 'day');
+    const dateMatches = moment(event.date).isSame(today, 'day');
     const timeMatches = currentTime >= startTime && currentTime <= (startTime + duration);
 
     return dateMatches && timeMatches;
