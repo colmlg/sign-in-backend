@@ -1,6 +1,5 @@
 const rangeParser = require('parse-numeric-range');
 const rp = require('request-promise-native');
-const cheerio = require('cheerio');
 const Lesson = require('../models/lesson');
 const Week = require('../models/week');
 const Module = require('../models/module');
@@ -19,10 +18,11 @@ function scrapeTimetable(userId) {
 function parse(timetable) {
     let lessons = [];
 
-    //When we get the result back from the API weeks is formatted like '1-12', we want a serpate lesson object for each week
     timetable.classes.forEach(lesson => {
         const mappedLessons = mapLesson(lesson);
         mappedLessons.forEach(mappedLesson => {
+            //When we get the result back from the API weeks is formatted like '1-12'.
+            //we want a separate lesson object for each week
             const allLessons = createLessonForEachWeek(mappedLesson);
             Array.prototype.push.apply(lessons, allLessons);
         });
@@ -67,7 +67,7 @@ function parse(timetable) {
 function mapLesson(lesson) {
 
     const type = lesson.type.split('-')[1];
-    //Annoyingly, moduleID could be two module IDS stuck together
+    //Annoyingly, moduleID could be two or more module IDs stuck together
     const moduleIds = parseModuleId(lesson.type.split('-')[0]);
 
     return moduleIds.map(id => {
@@ -84,6 +84,8 @@ function mapLesson(lesson) {
 }
 
 function parseModuleId(moduleId) {
+    //We could be stricter here, I /think/ module IDs are two letters followed by 4 numbers
+    // but I have no proof for that; and this works.
     const regex = new RegExp(/[A-Z]+\d+/);
     const ids = [];
     for (const match of matchAll(moduleId, regex)) {
@@ -92,7 +94,7 @@ function parseModuleId(moduleId) {
     return ids;
 }
 
-//This function creates a seperate object for each lesson.
+//This function creates a separate object for each lesson.
 function createLessonForEachWeek(lesson) {
     const explodedLessons = [];
     for (let i = 0; i < lesson.weeks.length; i++) {
@@ -148,7 +150,9 @@ function saveRoom(numbers) {
 function setDate(lesson) {
     return Week.find({id: lesson.weekNumber}).then(weeks => {
         const myDate = weeks[0].date;
+        const lessonTime = lesson.startTime.split(':');
         myDate.setDate(myDate.getDate() + lesson.day);
+        myDate.setHours(lessonTime[0], lessonTime[1]);
         lesson.date = myDate;
     });
 }
@@ -171,6 +175,7 @@ exports.saveLessons = function (studentId) {
 
 exports.scrapeTimetable = scrapeTimetable;
 
+//MARK: Regex functions for matchAll
 function ensureFlag(flags, flag) {
     return flags.includes(flag) ? flags : flags + flag;
 }

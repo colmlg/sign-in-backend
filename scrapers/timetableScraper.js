@@ -135,9 +135,9 @@ exports.saveLessons = function (userId) {
             });
         }));
     }).then(() => {
-        console.log('Scraped timetable for lecturer ' + userId);
+        console.log('Scraped timetable for student ' + userId);
     }).catch(error => {
-        console.log('Error getting timetable for lecturer ' + userId);
+        console.log('Error getting timetable for student ' + userId);
         console.log(error);
     });
 };

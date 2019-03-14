@@ -33,7 +33,9 @@ exports.getModule = function (req, res) {
             return res.status(403).send({error: 'You are not a lecturer of this module.'});
         }*/
 
-        return Lesson.find({moduleId: module.id}).then(lessons => {
+        return Lesson.find({moduleId: module.id}).sort({date: 1}).then(lessons => {
+
+
             res.status(200).json({
                 module: module,
                 lessons: lessons
