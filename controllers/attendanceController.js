@@ -5,6 +5,8 @@ const Room = require('../models/room');
 const moment = require('moment');
 const AzureService = require('../services/azureService');
 
+// db.lessons.update({moduleId: "CS4227"}, { $set: { studentsAttended: ["15148823"]} }, {multi: true} )
+
 /* Marks a user as having attended a lesson.
 First, we find the lesson currently on in this room.
 Then, we check is this student registered for this module.

@@ -1,6 +1,5 @@
 const rangeParser = require('parse-numeric-range');
 const rp = require('request-promise-native');
-const cheerio = require('cheerio');
 const Lesson = require('../models/lesson');
 const Week = require('../models/week');
 const Module = require('../models/module');
@@ -67,7 +66,7 @@ function parse(timetable) {
 function mapLesson(lesson) {
 
     const type = lesson.type.split('-')[1];
-    //Annoyingly, moduleID could be two module IDS stuck together
+    //Annoyingly, moduleID could be two or more module IDs stuck together
     const moduleIds = parseModuleId(lesson.type.split('-')[0]);
 
     return moduleIds.map(id => {
