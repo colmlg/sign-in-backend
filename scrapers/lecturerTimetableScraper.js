@@ -75,7 +75,7 @@ function mapLesson(lesson) {
             startTime: lesson.time.split('-')[0],
             endTime: lesson.time.split('-')[1],
             moduleId: id,
-            type: type == '' ? 'LEC' : type,
+            type: type === '' ? 'LEC' : type,
             roomNumber: lesson.room,
             weeks: rangeParser.parse(lesson.weeks),
             day: lesson.day,
