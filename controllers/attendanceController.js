@@ -1,6 +1,5 @@
 const Module = require('../models/module');
 const Lesson = require('../models/lesson');
-const Week = require('../models/week');
 const Room = require('../models/room');
 const moment = require('moment');
 const AzureService = require('../services/azureService');
@@ -17,57 +16,47 @@ exports.markAttendance = function (req, res) {
     Room.findOne({ id: req.body.roomNumber}).then(room => {
         return Lesson.find({roomNumber: room.roomNumber,
                             date: {
-                                $gte: moment().startOf('hour').toDate(),
-                                $lte:moment().endOf('hour').toDate()
+                                $gte: moment().startOf('day').toDate(),
+                                $lte: moment().endOf('day').toDate()
                             }
-        }).then(lessons => {
-            for (let i = 0; i < lessons.length; i++) {
-                if (isLessonCurrentlyOn(lessons[i])) {
-                    return lessons[i];
-                }
-            }
-            return Promise.reject({error: "No lesson on in this room right now."})
-        });
-    }).then(lesson => {
-        return Module.findOne({id: lesson.moduleId}).then(module => {
-            if (module.students.indexOf(req.userId) === -1) {
-                return Promise.reject({error: "You are not registered for this module."});
-            }
-
-            return lesson;
         })
-    }).then(event => {
+    }).then(lessons => {
+        lessons = lessons.filter(l => moment() >= moment(l.startTime, "H:mm") && moment() <= moment(l.endTime, "HH:mm"));
+
+        if(lessons.length === 0) {
+            return Promise.reject({error: "No lesson on in this room right now."});
+        }
+
+
+        return lessons;
+    }).then(lessons => {
+        return Module.find({id: { $in: lessons.map(l => l.moduleId) }, students: req.userId}).then(modules => {
+            let moduleIds = modules.map(m => m.id);
+            lessons = lessons.filter(l => moduleIds.indexOf(l.moduleId) !== -1);
+
+            if (lessons.length === 0) {
+                return Promise.reject({error: "You are not registered for any module in this room right now."});
+            }
+            return lessons;
+        });
+    }).then(lessons => {
         return AzureService.compareFaces(req.user.referenceImage, req.body.image).then(identical => {
             if (!identical) {
                 return Promise.reject({error: "Faces do not match."});
             }
 
-            return event;
+            return lessons;
         });
-    }).then(event => {
-        if (event.studentsAttended.indexOf(req.userId) === -1) {
-            event.studentsAttended.push(req.userId);
-        }
-
-        return event.save()
+    }).then(lessons => {
+        lessons.forEach(lesson => {
+            if (lesson.studentsAttended.indexOf(req.userId) === -1) {
+                lesson.studentsAttended.push(req.userId);
+            }
+            lesson.save()
+        });
     }).then(() => {
         res.status(200).json({});
     }).catch(error => {
         res.status(500).json(error);
     });
 };
-
-function isLessonCurrentlyOn(event) {
-    const today = moment();
-
-    const startTime = moment(event.startTime, 'hh:mm').hours();
-    const currentTime = moment().hours();
-
-    const endTime = moment(event.endTime, 'hh:mm').hours();
-    const duration = endTime - startTime;
-
-    const dateMatches = moment(event.date).isSame(today, 'day');
-    const timeMatches = currentTime >= startTime && currentTime <= (startTime + duration);
-
-    return dateMatches && timeMatches;
-}

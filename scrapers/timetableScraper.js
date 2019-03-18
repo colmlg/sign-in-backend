@@ -103,8 +103,6 @@ function mapLesson(lesson) {
 }
 
 function parseModuleId(moduleId) {
-    //We could be stricter here, I /think/ module IDs are two letters followed by 4 numbers
-    // but I have no proof for that; and this works.
     const regex = new RegExp(/[A-Z]+\d+/);
     const ids = [];
     for (const match of matchAll(moduleId, regex)) {
