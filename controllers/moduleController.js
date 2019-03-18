@@ -1,8 +1,6 @@
 const Module = require('../models/module');
 const Lesson = require('../models/lesson');
-const Room = require('../models/room');
 const Event = require('../models/event');
-require('moment-recur');
 
 exports.addModule = function (req, res) {
     Event.create(req.body.events).then(events => {
@@ -77,10 +75,4 @@ exports.addLecturerToModule = function (req, res) {
     }).catch(error => {
         res.status(500).json({ error: error });
     });
-};
-
-exports.getRoomNumbers = function(req, res) {
-    Room.find({}).select({ _id: 0, __v: 0}).then(rooms => {
-        res.status(200).json(rooms);
-    }).catch(error => res.status(500).json({error: error}));
 };

@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-const moduleController = require('../controllers/moduleController');
+const roomController = require('../controllers/roomController');
 
-router.get('/', moduleController.getRoomNumbers);
+router.get('/', roomController.getAllRoomNumbers);
+
+router.get('/:id', roomController.getRoomId);
 
 module.exports = router;
