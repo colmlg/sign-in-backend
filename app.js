@@ -33,12 +33,14 @@ const registerRouter = require('./routes/register');
 const loginRouter = require('./routes/login');
 const moduleRouter = require('./routes/module');
 const attendanceRouter = require('./routes/attendance');
+const roomRouter = require('./routes/room');
 
 app.use('/user', userRouter);
 app.use('/register', registerRouter);
 app.use('/login', loginRouter);
 app.use('/module', moduleRouter);
 app.use('/attendance', attendanceRouter);
+app.use('/room', roomRouter);
 
 
 // catch 404 and forward to error handler
