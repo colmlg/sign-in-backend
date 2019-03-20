@@ -5,7 +5,6 @@ const User = require('../models/user');
 const Lesson = require('../models/lesson');
 const AzureService = require('../services/azureService');
 const timetableScraper = require('../scrapers/timetableScraper');
-const lecturerTimetableScraper = require('../scrapers/lecturerTimetableScraper');
 
 exports.getUser = function (req, res, next) {
     User.findOne({id: req.userId}, function (error, user) {
@@ -23,11 +22,9 @@ exports.registerUser = function (req, res) {
     user.password = bcrypt.hashSync(user.password, 8);
 
     User.create(user).then(user => {
-        if (user.role === Constants.STUDENT) {
-            timetableScraper.saveLessons(user.id);
-        } else {
-            lecturerTimetableScraper.saveLessons(user.id);
-        }
+        return timetableScraper.saveLessons(user.id, user.role === Constants.LECTURER);
+    }).then(() => {
+        console.log('Successfully scraped timetable for user ' + user.id);
 
         const token = jwt.sign({id: user.id, role: user.role}, process.env.TOKEN_SECRET, {
             expiresIn: 864000 // expires in 240 hours

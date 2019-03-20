@@ -32,7 +32,6 @@ exports.getModule = function (req, res) {
         /*if (module.lecturers.indexOf(req.userId) === -1) {
             return res.status(403).send({error: 'You are not a lecturer of this module.'});
         }*/
-
         return Lesson.find({moduleId: module.id}).sort({date: 1}).then(lessons => {
 
 

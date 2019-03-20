@@ -10,7 +10,7 @@ exports.login = function (req, res) {
         }
 
         if (!user) {
-            return res.status(401).json({error: 'Invalid student number.'});
+            return res.status(401).json({error: 'Invalid user ID.'});
         }
 
         if (!bcrypt.compareSync(req.body.password, user.password)) {

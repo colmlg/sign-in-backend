@@ -1,33 +1,118 @@
 const rangeParser = require('parse-numeric-range');
 const rp = require('request-promise-native');
-const cheerio = require('cheerio');
 const Lesson = require('../models/lesson');
 const Week = require('../models/week');
 const Module = require('../models/module');
 const Room = require('../models/room');
 
-const studentIdPattern = /^[0-9]{7,8}$/;
-const entrySplitPattern = /\s*<.*?>(?:.*?<\/.*?>)?\s*(?:&#xA0;)?/;
-const daySelector = 'body > div > table > tbody > tr:nth-child(2) > td';
-const entrySelector = 'p > font > b';
+exports.saveLessons = function (userId, isStaff) {
+    return scrapeTimetable(userId, isStaff).then(lessons => {
+        return Promise.all(lessons.map(lesson => {
+            return Lesson.find({_id: lesson._id}).then(lessons => {
+                if (lessons.length === 0)
+                    lesson.save();
+            });
+        }));
+    });
+};
 
-function parseLesson(element) {
-    const parts = element.trim().split(entrySplitPattern);
-    return {
-        startTime: parts[0],
-        endTime: parts[1],
-        moduleId: parts[2],
-        type: parts[3],
-        roomNumber: parts[5].split(/\s+/)[0], //Let's just take the first room for now
-        weeks: rangeParser.parse(parts[6].substring(4)),
+
+function scrapeTimetable(userId, isStaff) {
+    const options = {
+        uri: 'http://35.189.65.75/id-timetable-v2.php/id/' + userId + '/staff/' + isStaff,
     };
+    return rp.get(options).then(response => {
+        const timetable = JSON.parse(response);
+        return parse(timetable);
+    });
 }
 
-//When we parse the information from the timetable we get a range of weeks.
-//This function creates a seperate object for each lesson.
-function createLessonForEachWeek(lesson, day) {
+exports.scrapeTimetable = scrapeTimetable;
+
+
+function parse(timetable) {
+    let lessons = [];
+
+    timetable.classes.forEach(lesson => {
+        const mappedLessons = mapLesson(lesson);
+        mappedLessons.forEach(mappedLesson => {
+            //When we get the result back from the API weeks is formatted like '1-12'.
+            //we want a separate lesson object for each week
+            const allLessons = createLessonForEachWeek(mappedLesson);
+            Array.prototype.push.apply(lessons, allLessons);
+        });
+    });
+
+
+    //Create a 'Module' object in the DB if it doesn't exist. Also adds the current user to that module.
+    const moduleIds = new Set(lessons.map(lesson => {
+        return lesson.moduleId;
+    }));
+    createModulesIfNotExists(moduleIds, timetable.id);
+
+    //Create room objects if they dont exist.
+    const roomNumbers = new Set(lessons.map(lesson => {
+        return lesson.roomNumber;
+    }));
+    saveRoom(roomNumbers);
+
+    return Promise.all(lessons.map(lesson => {
+        //Set the date on the lesson objects. We would do this sooner but it returns a promise so this is cleaner.
+        return setDate(lesson);
+    })).then(() => {
+        return lessons.map(lesson => {
+            //Create a unique ID for these lesson objects.
+            lesson._id = lesson.moduleId + '_' + lesson.type + "_" + lesson.startTime + "_" + lesson.date;
+            return new Lesson(lesson);
+        });
+    });
+}
+
+/* Maps the lessons from this format to ours:
+{
+      "day": 1,
+      "time": "09:00-10:00",
+      "type": "CS4115-LAB-2A",
+      "name": "Data Structures And Algorithms",
+      "room": "CS3005B",
+      "weeks": "1-12"
+    }
+ */
+
+function mapLesson(lesson) {
+
+    const type = lesson.type.split('-')[1];
+    //Annoyingly, moduleID could be two or more module IDs stuck together
+    const moduleIds = parseModuleId(lesson.type.split('-')[0]);
+
+    return moduleIds.map(id => {
+        return {
+            startTime: lesson.time.split('-')[0],
+            endTime: lesson.time.split('-')[1],
+            moduleId: id,
+            type: type == '' ? 'LEC' : type,
+            roomNumber: lesson.room,
+            weeks: rangeParser.parse(lesson.weeks),
+            day: lesson.day,
+        }
+    });
+}
+
+function parseModuleId(moduleId) {
+    //We could be stricter here, I /think/ module IDs are two letters followed by 4 numbers
+    // but I have no proof for that; and this works.
+    const regex = new RegExp(/[A-Z]+\d+/);
+    const ids = [];
+    for (const match of matchAll(moduleId, regex)) {
+        ids.push(match[0]);
+    }
+    return ids;
+}
+
+//This function creates a separate object for each lesson.
+function createLessonForEachWeek(lesson) {
     const explodedLessons = [];
-    for(let i =0; i < lesson.weeks.length; i++) {
+    for (let i = 0; i < lesson.weeks.length; i++) {
         explodedLessons.push({
             startTime: lesson.startTime,
             endTime: lesson.endTime,
@@ -35,65 +120,27 @@ function createLessonForEachWeek(lesson, day) {
             type: lesson.type,
             roomNumber: lesson.roomNumber,
             weekNumber: lesson.weeks[i],
-            day: day,
+            day: lesson.day,
         });
     }
     return explodedLessons;
 }
 
-function setDate(lesson) {
-    return Week.find({id: lesson.weekNumber}).then(weeks => {
-        const myDate = weeks[0].date;
-        myDate.setDate(myDate.getDate() + lesson.day);
-        lesson.date = myDate;
-    });
-}
-
-function parse(studentId, $) {
-    let lessons = [];
-    $(daySelector).each((dayIndex, day) => {
-        $(entrySelector, day).each((j, lessonElement) => {
-            const parsedLesson = parseLesson($(lessonElement).html());
-            const allLessons = createLessonForEachWeek(parsedLesson, dayIndex)
-            Array.prototype.push.apply(lessons, allLessons);
-        });
-    });
-
-    const moduleIds = new Set(lessons.map(lesson => {
-        return lesson.moduleId;
-    }));
-    createModulesIfNotExists(moduleIds, studentId);
-
-    const roomNumbers = new Set(lessons.map(lesson => {
-        return lesson.roomNumber;
-    }));
-    saveRoom(roomNumbers);
-
-    return Promise.all(lessons.map(lesson => {
-        return setDate(lesson);
-    })).then(() => {
-        return lessons.map(lesson => {
-            lesson._id = lesson.moduleId + '_' + lesson.type + "_" + lesson.startTime + "_" + lesson.date;
-            return new Lesson(lesson);
-        });
-    });
-}
-
-function createModulesIfNotExists(moduleIds, studentId) {
+function createModulesIfNotExists(moduleIds, userId) {
     moduleIds.forEach(id => {
         Module.find({id: id}).then(modules => {
             let module;
-            if(modules.length === 0) {
+            if (modules.length === 0) {
                 module = new Module({
                     id: id,
-                    students: []
+                    users: []
                 });
             } else {
                 module = modules[0];
             }
 
-            if (module.students.indexOf(studentId) === -1) {
-                module.students.push(studentId);
+            if (module.users.indexOf(userId) === -1) {
+                module.users.push(userId);
             }
 
             module.save();
@@ -105,7 +152,7 @@ function createModulesIfNotExists(moduleIds, studentId) {
 function saveRoom(numbers) {
     numbers.forEach(roomNumber => {
         Room.find({roomNumber: roomNumber}).then(rooms => {
-            if(rooms.length === 0) {
+            if (rooms.length === 0) {
                 const room = new Room({roomNumber: roomNumber});
                 room.save();
                 console.log('Created room ' + roomNumber);
@@ -114,32 +161,26 @@ function saveRoom(numbers) {
     });
 }
 
-function scrapeTimetable(studentId) {
-    const options = {
-        uri: 'https://www.timetable.ul.ie/tt2.asp',
-        form: {
-            T1: studentId,
-        },
-    };
-    return rp.post(options).then(cheerio.load).then($ => {
-        return parse(studentId, $)
+function setDate(lesson) {
+    return Week.find({id: lesson.weekNumber}).then(weeks => {
+        const myDate = weeks[0].date;
+        const lessonTime = lesson.startTime.split(':');
+        myDate.setDate(myDate.getDate() + lesson.day);
+        myDate.setHours(lessonTime[0], lessonTime[1]);
+        lesson.date = myDate;
     });
 }
 
-exports.saveLessons = function (userId) {
-    scrapeTimetable(userId).then(lessons => {
-        return Promise.all(lessons.map(lesson => {
-            return Lesson.find({_id: lesson._id }).then(lessons => {
-                if(lessons.length === 0)
-                    lesson.save();
-            });
-        }));
-    }).then(() => {
-        console.log('Scraped timetable for student ' + userId);
-    }).catch(error => {
-        console.log('Error getting timetable for student ' + userId);
-        console.log(error);
-    });
-};
+//MARK: Regex functions for matchAll
+function ensureFlag(flags, flag) {
+    return flags.includes(flag) ? flags : flags + flag;
+}
 
-exports.scrapeTimetable = scrapeTimetable;
+function* matchAll(str, regex) {
+    const localCopy = new RegExp(
+        regex, ensureFlag(regex.flags, 'g'));
+    let match;
+    while (match = localCopy.exec(str)) {
+        yield match;
+    }
+}
