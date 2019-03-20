@@ -1,10 +1,13 @@
+const moment = require("moment");
+
 require('mocha');
 const assert = require('assert');
 
 const rewire = require('rewire');
-const lecturerTimetableScraper = rewire('../scrapers/lecturerTimetableScraper');
+const timetableScraper = rewire('../scrapers/timetableScraper');
 
-const scrapeTimetable = lecturerTimetableScraper.__get__('scrapeTimetable');
+const scrapeTimetable = timetableScraper.__get__('scrapeTimetable');
+const setLessonDate = timetableScraper.__get__('setLessonDate');
 
 function ensureFlag(flags, flag) {
     return flags.includes(flag) ? flags : flags + flag;
@@ -36,6 +39,31 @@ describe('LecturerTimetableScraper', function () {
             for (const match of matchAll(testString, regex)) {
                 console.log(match[0]);
             }
+            done();
+        });
+    });
+
+    describe('#testSetLessonDate()', function () {
+        it('sets the correct date', function (done) {
+            const weekDateString = '18 Mar 2019'; //Monday
+            const weekDate = moment(weekDateString, "DD MMM YYYY").toDate();
+
+            const week = {
+                id: 9,
+                date: weekDate
+            };
+
+            const lesson = {
+                startTime: '12:00',
+                day: 2, //0-indexed from Monday
+                date: null
+            };
+
+            setLessonDate(lesson, week);
+
+            const expectedDate = moment('20 Mar 2019 12:00', "DD MMM YYYY HH:mm").toDate();
+            assert(expectedDate.toString() === lesson.date.toString());
+            done();
         });
     });
 });

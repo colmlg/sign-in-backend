@@ -1,4 +1,5 @@
 const Week = require('../models/week');
+const moment = require('moment');
 const rp = require('request-promise-native');
 const cheerio = require('cheerio');
 const weekSelector = 'body > table > tbody > tr';
@@ -10,7 +11,7 @@ function parse($) {
     $(weekSelector).slice(1).each((i, row) => {
         weeks[i] = new Week({
             id: $(teachingWeekSelector, row).text(),
-            date: new Date($(startDateSelector, row).text()),
+            date: moment($(startDateSelector, row).text(), "DD MMM YYYY").toDate(),
         });
     });
     return weeks;
@@ -30,7 +31,7 @@ function saveToDB() {
                 dbWeek = dbWeek[0];
                 dbWeek.date = updatedWeek.date;
                 dbWeek.save();
-            }).catch(error => {
+            }).catch(() => {
                 updatedWeek.save()
             })
         })

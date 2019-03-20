@@ -5,6 +5,8 @@ const Week = require('../models/week');
 const Module = require('../models/module');
 const Room = require('../models/room');
 
+let _isStaff;
+
 exports.saveLessons = function (userId, isStaff) {
     return scrapeTimetable(userId, isStaff).then(lessons => {
         return Promise.all(lessons.map(lesson => {
@@ -18,6 +20,8 @@ exports.saveLessons = function (userId, isStaff) {
 
 
 function scrapeTimetable(userId, isStaff) {
+    _isStaff = isStaff;
+
     const options = {
         uri: 'http://35.189.65.75/id-timetable-v2.php/id/' + userId + '/staff/' + isStaff,
     };
@@ -90,10 +94,10 @@ function mapLesson(lesson) {
             startTime: lesson.time.split('-')[0],
             endTime: lesson.time.split('-')[1],
             moduleId: id,
-            type: type == '' ? 'LEC' : type,
+            type: type === '' ? 'LEC' : type,
             roomNumber: lesson.room,
             weeks: rangeParser.parse(lesson.weeks),
-            day: lesson.day,
+            day: lesson.day - 1,
         }
     });
 }
@@ -139,12 +143,14 @@ function createModulesIfNotExists(moduleIds, userId) {
                 module = modules[0];
             }
 
-            if (module.users.indexOf(userId) === -1) {
-                module.users.push(userId);
+            if (_isStaff && module.lecturers.indexOf(userId) === -1) {
+                module.lecturers.push(userId);
+            } else if (!_isStaff && module.students.indexOf(userId) === -1) {
+                module.students.push(userId);
             }
 
             module.save();
-            console.log('Saving module ' + id);
+            console.log('Saved module ' + id);
         })
     })
 }
@@ -162,13 +168,17 @@ function saveRoom(numbers) {
 }
 
 function setDate(lesson) {
-    return Week.find({id: lesson.weekNumber}).then(weeks => {
-        const myDate = weeks[0].date;
-        const lessonTime = lesson.startTime.split(':');
-        myDate.setDate(myDate.getDate() + lesson.day);
-        myDate.setHours(lessonTime[0], lessonTime[1]);
-        lesson.date = myDate;
+    return Week.findOne({id: lesson.weekNumber}).then(week => {
+        setLessonDate(lesson, week)
     });
+}
+
+function setLessonDate(lesson, week) {
+    const myDate = week.date;
+    const lessonTime = lesson.startTime.split(':');
+    myDate.setDate(myDate.getDate() + lesson.day);
+    myDate.setHours(lessonTime[0], lessonTime[1]);
+    lesson.date = myDate;
 }
 
 //MARK: Regex functions for matchAll
