@@ -64,4 +64,10 @@ weekScraper.saveToDB().then(() => {
     console.log('Saved Weeks in Database');
 });
 
+const dataMocker = require('./test/dataMocker');
+dataMocker.saveMockData().then(() => {
+    console.log('Saved mock data.');
+});
+
+
 module.exports = app;

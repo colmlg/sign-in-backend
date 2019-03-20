@@ -1,20 +1,5 @@
 const Module = require('../models/module');
 const Lesson = require('../models/lesson');
-const Event = require('../models/event');
-
-exports.addModule = function (req, res) {
-    Event.create(req.body.events).then(events => {
-        req.body.events = events.map(function (event) {
-            return event._id;
-        });
-
-        return Module.create(req.body);
-    }).then(module => {
-        res.status(200).send(module);
-    }).catch(error => {
-        res.status(500).json({error: error});
-    });
-};
 
 exports.getModules = function (req, res) {
     Module.find({lecturers: req.userId}).populate('events').exec().then(modules => {
