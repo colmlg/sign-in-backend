@@ -10,7 +10,7 @@ const Room = require('../models/room');
 
 const num_modules = 5;
 const num_students = 200;
-const num_lessons = 20;
+const num_lessons = 80;
 
 let _lecturer;
 let _students;
@@ -20,6 +20,7 @@ let _room;
 
 exports.saveMockData = function () {
     return createMockUsers().then(() => createMockModules()).then(() => createMockRoom()).then(() => createMockLessons()).catch(error => {
+        console.log(error);
         console.log('Error creating mock data.')
     })
 };
@@ -78,12 +79,19 @@ function createMockLessons() {
 
     for (let i = 0; i < num_modules; i++) {
         for (let j = 0; j < num_lessons; j++) {
+            let type = 'LEC';
+            if(j % 3 === 0) {
+                type = 'LAB';
+            } else if (j % 4 === 0) {
+                type = 'TUT';
+            }
+
             let lesson = {
-                type: j % 2 === 0 ? Constants.LECTURE : Constants.LAB,
+                type: type,
                 moduleId: _modules[i].id,
-                startTime: "00:00",
-                endTime: "23:59",
-                date: moment().subtract(j * 3, 'days'),
+                startTime: "09:00",
+                endTime: "18:00",
+                date: moment().subtract(j * 2, 'days'),
                 roomNumber: _room.roomNumber,
                 studentsAttended: [],
                 _id: `${_modules[i].id}_${j}`
@@ -91,7 +99,10 @@ function createMockLessons() {
 
 
             _students.forEach(s => {
-                const chance = Math.random();
+                let chance = Math.random();
+                if(type === 'TUT') {
+                    chance = chance - 0.2;
+                }
                 if (0.2 * i <= chance) {
                     lesson.studentsAttended.push(s.id);
                 }
