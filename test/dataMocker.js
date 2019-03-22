@@ -10,7 +10,7 @@ const Room = require('../models/room');
 
 const num_modules = 5;
 const num_students = 200;
-const num_lessons = 5;
+const num_lessons = 20;
 
 let _lecturer;
 let _students;
@@ -20,7 +20,6 @@ let _room;
 
 exports.saveMockData = function () {
     return createMockUsers().then(() => createMockModules()).then(() => createMockRoom()).then(() => createMockLessons()).catch(error => {
-        console.log(error);
         console.log('Error creating mock data.')
     })
 };
@@ -35,7 +34,7 @@ function createMockUsers() {
 
     _lecturer = lecturer;
 
-    lecturer.save();
+
 
     let students = [];
     for (let i = 0; i < num_students; i++) {
@@ -48,14 +47,14 @@ function createMockUsers() {
 
     _students = students;
 
-    return User.create(students);
+    return Promise.all([User.create(students), lecturer.save()]);
 }
 
 function createMockModules() {
     let modules = [];
-    for (let i = 0; i < num_modules; i++) {
+    for (let i = 1; i <= num_modules; i++) {
         modules.push(new Module({
-            id: `CS000${i}`,
+            id: `CS123${i}`,
             lecturers: [_lecturer.id],
             students: _students.map(s => s.id),
         }))
@@ -80,11 +79,11 @@ function createMockLessons() {
     for (let i = 0; i < num_modules; i++) {
         for (let j = 0; j < num_lessons; j++) {
             let lesson = {
-                type: Constants.LECTURE,
+                type: j % 2 === 0 ? Constants.LECTURE : Constants.LAB,
                 moduleId: _modules[i].id,
                 startTime: "00:00",
                 endTime: "23:59",
-                date: moment().subtract(j, 'days'),
+                date: moment().subtract(j * 3, 'days'),
                 roomNumber: _room.roomNumber,
                 studentsAttended: [],
                 _id: `${_modules[i].id}_${j}`
