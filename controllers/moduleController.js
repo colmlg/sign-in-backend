@@ -14,9 +14,6 @@ exports.getModules = function (req, res) {
 
 exports.getModule = function (req, res) {
     Module.findOne({id: req.params.id}).select({ id: 1, students: 1, lecturers: 1, _id: 0}).then(module => {
-        /*if (module.lecturers.indexOf(req.userId) === -1) {
-            return res.status(403).send({error: 'You are not a lecturer of this module.'});
-        }*/
         return Lesson.find({moduleId: module.id}).select({ _id: 0, __v: 0}).sort({date: -1}).then(lessons => {
 
 
