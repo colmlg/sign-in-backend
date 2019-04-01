@@ -1,3 +1,5 @@
+const moment = require("moment");
+
 const Module = require('../models/module');
 const Lesson = require('../models/lesson');
 const Constants = require('../constants');
@@ -16,6 +18,8 @@ exports.getModule = function (req, res) {
     Module.findOne({id: req.params.id}).select({ id: 1, students: 1, lecturers: 1, _id: 0}).then(module => {
         return Lesson.find({moduleId: module.id}).select({ _id: 0, __v: 0}).sort({date: -1}).then(lessons => {
 
+            const today = new Date();
+            lessons = lessons.filter(l => new Date(l.date) <= today );
 
             res.status(200).json({
                 module: module,

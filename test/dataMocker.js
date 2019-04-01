@@ -9,8 +9,8 @@ const Room = require('../models/room');
 
 
 const num_modules = 5;
-const num_students = 400;
-const num_lessons = 80;
+const num_students = 60;
+const num_lessons = 40;
 
 let _lecturer;
 let _students;
@@ -102,6 +102,11 @@ function createMockLessons() {
                 if(type === 'TUT') {
                     chance = chance - 0.2;
                 }
+
+                if(type === 'LAB') {
+                    chance = chance + 0.1;
+                }
+
                 if (0.2 * i <= chance) {
                     lesson.studentsAttended.push(s.id);
                 }
