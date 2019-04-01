@@ -1,23 +1,13 @@
+const moment = require("moment");
+
 const Module = require('../models/module');
 const Lesson = require('../models/lesson');
-const Event = require('../models/event');
-
-exports.addModule = function (req, res) {
-    Event.create(req.body.events).then(events => {
-        req.body.events = events.map(function (event) {
-            return event._id;
-        });
-
-        return Module.create(req.body);
-    }).then(module => {
-        res.status(200).send(module);
-    }).catch(error => {
-        res.status(500).json({error: error});
-    });
-};
+const Constants = require('../constants');
 
 exports.getModules = function (req, res) {
-    Module.find({lecturers: req.userId}).populate('events').exec().then(modules => {
+    const findObj = req.user.role === Constants.STUDENT ? {students: req.userId} : {lecturers: req.userId};
+
+    Module.find(findObj).select({ id: 1, _id: 0}).sort({id: 1}).then(modules => {
         res.status(200).json(modules)
     }).catch(error => {
         res.status(500).json({error: error});
@@ -25,13 +15,11 @@ exports.getModules = function (req, res) {
 };
 
 exports.getModule = function (req, res) {
+    Module.findOne({id: req.params.id}).select({ id: 1, students: 1, lecturers: 1, _id: 0}).then(module => {
+        return Lesson.find({moduleId: module.id}).select({ _id: 0, __v: 0}).sort({date: -1}).then(lessons => {
 
-    Module.findOne({id: req.params.id}).exec().then(module => {
-        /*if (module.lecturers.indexOf(req.userId) === -1) {
-            return res.status(403).send({error: 'You are not a lecturer of this module.'});
-        }*/
-        return Lesson.find({moduleId: module.id}).sort({date: 1}).then(lessons => {
-
+            const today = new Date();
+            lessons = lessons.filter(l => new Date(l.date) <= today );
 
             res.status(200).json({
                 module: module,

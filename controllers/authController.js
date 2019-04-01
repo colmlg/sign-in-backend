@@ -21,7 +21,11 @@ exports.login = function (req, res) {
             expiresIn: 86400 // expires in 24 hours
         });
 
-        res.send({token: token});
+        let response = {token: token};
+        if(user.referenceImage === undefined) {
+            response.imageSet = false;
+        }
+        res.send(response);
     });
 };
 
